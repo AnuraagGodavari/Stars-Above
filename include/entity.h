@@ -1,0 +1,92 @@
+#pragma once
+
+#ifndef __SA_ENTITY_H__
+#define __SA_ENTITY_H__
+
+#include <SDL.h>
+#include "gf2d_graphics.h"
+#include "gf2d_sprite.h"
+#include "simple_logger.h"
+#include "gfc_types.h"
+
+#include "collision.h"
+#include "camera.h"
+
+/*typedef enum Parent_Type
+{
+
+	ENT_UI,
+	ENT_STAR,
+	ENT_PLANET
+
+} Parent_Type;*/
+
+typedef struct Entity_s
+{
+
+	short _inuse;
+
+	Sprite* sprite;
+
+	Vector2D pos;
+	int ingame_object;
+
+	Collider_Box* colliderbox;
+	Collider_Circle* collidercircle;
+
+	short _hidden;
+
+	void* parent;
+
+	void (*draw) (struct Entity_s* self, Camera* cam);
+
+	void (*free) (struct Entity_s* self);
+
+} Entity;
+
+/*
+* @brief Initialize the entity manager
+*/
+void entity_manager_init(Uint32 max_entities);
+
+/*
+* @brief Free the entity manager
+*/
+void entity_manager_free();
+
+
+/*
+* @brief Check and see if an entity is visible and clickable
+* @return The entity that the mouse is hovering over
+*/
+Entity* entities_clickable(Vector2D mousepos);
+
+/*
+* @brief Draw all entities in the entity manager
+*/
+void entities_draw();
+
+
+/*
+* @brief Initialize a visualizable entity.
+* @param collidertype What kind of collider (circle or square)
+* @param is_ingameobject If the entity belongs to something that exists in the ingame world (otherwise it is something like UI)
+*/
+Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertype, short is_ingameobject, short is_hidden);
+
+/*
+* @brief Draw the entity to the screen relative to the position of the camera
+*/
+void entity_draw(Entity* self);
+
+/*
+* @brief Draw the entity to the screen relative to the position of the camera
+*/
+int entity_clickable(Entity* self, Vector2D mousepos);
+
+/*
+* @brief Free the entity struct
+*/
+void entity_free(Entity* self);
+
+#endif
