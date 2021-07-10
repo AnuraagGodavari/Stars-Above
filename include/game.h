@@ -10,6 +10,7 @@
 #include "gfc_types.h"
 
 #include "camera.h"
+#include "text.h"
 
 #include "entity.h"
 

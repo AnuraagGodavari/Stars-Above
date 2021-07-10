@@ -11,6 +11,7 @@
 
 #include "collision.h"
 #include "camera.h"
+#include "text.h"
 
 /*typedef enum Parent_Type
 {
@@ -34,11 +35,17 @@ typedef struct Entity_s
 	Collider_Box* colliderbox;
 	Collider_Circle* collidercircle;
 
+	char text[256];
+	Font* font;
+
 	short _hidden;
 
 	void* parent;
 
 	void (*draw) (struct Entity_s* self, Camera* cam);
+
+	//Points to a function belonging to Entity->parent, which will convert the void pointer to a type pointer.
+	void (*onClick) (void* self_void);
 
 	void (*free) (struct Entity_s* self);
 

@@ -59,9 +59,14 @@ int main(int argc, char* argv[])
     mouse_click = gf2d_sprite_load_all("resources/images/ui/cursor_click.png", 32, 32, 1);
     mouse_drag = gf2d_sprite_load_all("resources/images/ui/cursor_drag.png", 32, 32, 1);
 
+    //Initialize Camera
     gamedata.camera = camera_init(vector2d(0, 0), gamedata.screensize, vector2d(2, 2));
 
+    //Initialize Entity Manager
     entity_manager_init(100);
+
+    //Initialize Font System
+    font_init(50);
 
     parallax0 = parallax_init(gf2d_sprite_load_image("resources/images/background/bg_overlay.png"), vector2d(0, 0), 0.5);
     parallax1 = parallax_init(gf2d_sprite_load_image("resources/images/background/bg_overlay_02.png"), vector2d(0, 0), 0.2);
@@ -98,11 +103,8 @@ int main(int argc, char* argv[])
 
         mouse_update(mouse_idle, mouse_click, mouse_drag);
         
-        /*Drawing entity test BEGIN*/
         int mx, my;
         SDL_GetMouseState(&mx, &my);
-        //if (entity_clickable(test, vector2d(mx, my))) { }
-        /*Drawing entity test END*/
 
         gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
 
