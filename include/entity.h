@@ -30,15 +30,17 @@ typedef struct Entity_s
 	Sprite* sprite;
 
 	Vector2D pos;
-	int ingame_object;
+	short ingame_object;
 
 	Collider_Box* colliderbox;
 	Collider_Circle* collidercircle;
 
 	char text[256];
 	Font* font;
+	Vector2D textoffset;
 
 	short _hidden;
+	short _clickable;
 
 	void* parent;
 
@@ -80,6 +82,17 @@ void entities_draw();
 * @param is_ingameobject If the entity belongs to something that exists in the ingame world (otherwise it is something like UI)
 */
 Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertype, short is_ingameobject, short is_hidden);
+
+/*
+* @brief Add text to an entity with a particular position.
+* @param position Relative position of the text to the entity
+*/
+void entity_add_text_pos(Entity* self, char text[256], Font* font, Vector2D pos);
+
+/*
+* @brief Add text to an entity with an automatically determined position.
+*/
+void entity_add_text(Entity* self, char text[256], Font* font);
 
 /*
 * @brief Draw the entity to the screen relative to the position of the camera

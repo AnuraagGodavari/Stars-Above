@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef __UI_BASE_H__
+#define __UI_BASE_H__
+
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
 #include "simple_logger.h"
@@ -7,17 +10,55 @@
 
 #include "entity.h"
 
-typedef struct
+typedef struct UI_Object_s
 {
 
 	Entity* ent;
-	
+
+	struct UI_Object_s* next;
 
 } UI_Object;
 
 typedef struct
 {
 
-	UI_Object* ui_list;
+	UI_Object* top;
+
+	int x_spacing;
+	int y_spacing;
 
 } UI_Arrangement;
+
+/*
+* @brief create a new UI_Object
+* @param entity (Optional) Entity to tie to the UI object.
+*/
+UI_Object* ui_object_new(Entity* entity);
+
+/*
+* @brief Add a new UI_Object into self->next
+* @param new_ui UI_Object to add
+*/
+void ui_object_add(UI_Object* self, UI_Object* new_ui, int x_spacing, int y_spacing);
+
+/*
+* @brief free a UI_Object
+*/
+void ui_object_free(UI_Object* self);
+
+/*
+* @brief create a new UI_Arrangement
+*/
+UI_Arrangement* ui_arr_new(UI_Object* root, int x_spacing, int y_spacing);
+
+/*
+* @brief Add a new UI Object to the arrangement
+*/
+void ui_arr_add(UI_Arrangement* self, UI_Object* new_ui);
+
+/*
+* @brief free a UI_Arrangement
+*/
+void ui_arr_free(UI_Arrangement* self);
+
+#endif

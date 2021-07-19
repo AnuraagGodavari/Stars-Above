@@ -118,7 +118,7 @@ void entities_draw()
 
 //Individual Entity struct code
 
-Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertype, int is_ingameobject, short is_hidden)
+Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertype, short is_ingameobject, short is_hidden)
 {
 	int i;
 
@@ -201,11 +201,51 @@ Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertyp
 		entity->colliderbox = NULL;
 	}
 
+
 	entity->draw = NULL;
+
+	entity->font = NULL;
 
 	entity->_inuse = 1;
 
 	return entity;
+}
+
+void entity_add_text_pos(Entity* self, char text[256], Font* font, Vector2D pos)
+{
+	if (!text)
+	{
+		slog("Cannot add NULL text to an entity"); return;
+	}
+
+	if (!font)
+	{
+		slog("Cannot add text with NULL font to an entity"); return;
+	}
+
+	strcpy(self->text, text);
+	self->font = font;
+	vector2d_copy(self->textoffset, pos);
+
+}
+
+void entity_add_text(Entity* self, char text[256], Font* font)
+{
+	if (!text)
+	{
+		slog("Cannot add NULL text to an entity"); return;
+	}
+
+	if (!font)
+	{
+		slog("Cannot add text with NULL font to an entity"); return;
+	}
+
+	entity_add_text_pos(self, text, font,
+		vector2d(
+			self->sprite->frame_h * 0.2,
+			(self->sprite->frame_h - font->ptsize) / 2
+		));
 }
 
 void entity_draw(Entity* self)
@@ -242,7 +282,6 @@ void entity_draw(Entity* self)
 
 			if (self->collidercircle)
 			{
-				slog("ASD");
 				vector2d_copy(self->collidercircle->viewpos, vector2d(self->collidercircle->worldpos.x - cam->pos.x, self->collidercircle->worldpos.y - cam->pos.y));
 			}
 
@@ -264,12 +303,24 @@ void entity_draw(Entity* self)
 					0
 				);
 
+				if (self->font)
+				{
+					font_render(self->font, self->text,
+						vector2d(
+							self->pos.x - cam->pos.x + self->textoffset.x,
+							self->pos.y - cam->pos.y + self->textoffset.y
+						),
+						gfc_color(1, 1, 1, 0)
+					);
+				}
+
 
 			}
 		}
 
 		else
 		{
+
 			gf2d_sprite_draw
 			(
 				self->sprite,
@@ -281,6 +332,17 @@ void entity_draw(Entity* self)
 				NULL,
 				0
 			);
+
+			if (self->font)
+			{
+				font_render(self->font, self->text,
+					vector2d(
+						self->pos.x + self->textoffset.x,
+						self->pos.y + self->textoffset.y
+					),
+					gfc_color(1, 1, 1, 0)
+				);
+			}
 		}
 	}
 

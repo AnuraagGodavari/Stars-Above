@@ -13,12 +13,12 @@
 #include "text.h"
 
 #include "entity.h"
+#include "ui_base.h"
 
 typedef struct 
 {
 
 	Vector2D screensize;
-	Camera* camera;
 
 	Entity* hovering_ent;
 

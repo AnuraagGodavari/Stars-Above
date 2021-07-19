@@ -2,6 +2,49 @@
 
 Game_Data gamedata = { 0 };
 
+void testing()
+{
+    //TEST
+    UI_Arrangement* test_ui;
+    Entity* test_ent;
+
+    /* ui test BEGIN*/
+    test_ui = ui_arr_new(
+        ui_object_new(
+            entity_init
+            (
+                gf2d_sprite_load_image("resources/images/ui/textbox_brown.png"),
+                vector2d(10, 10),
+                COLL_BOX,
+                0,
+                0
+            )
+        ),
+        0,
+        10
+    );
+
+    entity_add_text(test_ui->top->ent, "TESTING ONE TWO THREE", font_load("resources/fonts/futura light bt.ttf", 16));
+
+    //*
+    ui_arr_add(
+        test_ui,
+        ui_object_new(
+            entity_init
+            (
+                gf2d_sprite_load_image("resources/images/ui/textbox_brown.png"),
+                vector2d(0, 0),
+                COLL_BOX,
+                0,
+                0
+            )
+        )
+    );
+
+    //*/
+    /* ui test END*/
+}
+
 Bool clickable()
 {
     return 0;
@@ -33,9 +76,7 @@ int main(int argc, char* argv[])
 
     Vector4D mouseColor = { 255,100,255,200 };
 
-    Entity* test;
-
-    vector2d_copy(gamedata.screensize, vector2d(1280, 720));
+    vector2d_copy(gamedata.screensize, vector2d(1600, 900));
 
     /*program initializtion*/
     init_logger("gf2d.log");
@@ -53,14 +94,14 @@ int main(int argc, char* argv[])
     SDL_ShowCursor(SDL_DISABLE);
 
     /*demo setup*/
-    background = gf2d_sprite_load_image("resources/images/background/bg_base.png");
+    background = gf2d_sprite_load_image("resources/images/background/bg_1600_900.png");
 
     mouse_idle = gf2d_sprite_load_all("resources/images/ui/cursor.png", 32, 32, 1);
     mouse_click = gf2d_sprite_load_all("resources/images/ui/cursor_click.png", 32, 32, 1);
     mouse_drag = gf2d_sprite_load_all("resources/images/ui/cursor_drag.png", 32, 32, 1);
 
     //Initialize Camera
-    gamedata.camera = camera_init(vector2d(0, 0), gamedata.screensize, vector2d(2, 2));
+    camera_init(vector2d(0, 0), gamedata.screensize, vector2d(2, 2));
 
     //Initialize Entity Manager
     entity_manager_init(100);
@@ -71,16 +112,7 @@ int main(int argc, char* argv[])
     parallax0 = parallax_init(gf2d_sprite_load_image("resources/images/background/bg_overlay.png"), vector2d(0, 0), 0.5);
     parallax1 = parallax_init(gf2d_sprite_load_image("resources/images/background/bg_overlay_02.png"), vector2d(0, 0), 0.2);
 
-    /* entity test BEGIN*/
-    test = entity_init
-    (
-        gf2d_sprite_load_image("resources/images/bibbutest.png"),
-        vector2d(0,0),
-        COLL_CIRCLE,
-        0,
-        0
-    );
-    /* entity test END*/
+    testing();
 
     /*main game loop*/
     while (!done)
@@ -147,13 +179,13 @@ void mouse_update(Sprite* idle, Sprite* hover, Sprite* drag)
 
     //Move camera
 
-    if (mx < gamedata.screensize.x * 0.04) { camx = -1; }
+    if (mx < gamedata.screensize.x * 0.01) { camx = -1; }
 
-    if (mx > gamedata.screensize.x - (gamedata.screensize.x * 0.04)) { camx = 1;  }
+    if (mx > gamedata.screensize.x - (gamedata.screensize.x * 0.01)) { camx = 1;  }
 
-    if (my < gamedata.screensize.y * 0.07) { camy = -1; }
+    if (my < gamedata.screensize.y * 0.02) { camy = -1; }
 
-    if (my > gamedata.screensize.y - (gamedata.screensize.y * 0.07)) { camy = 1;  }
+    if (my > gamedata.screensize.y - (gamedata.screensize.y * 0.02)) { camy = 1;  }
 
     camera_move(vector2d(camx, camy));
 
