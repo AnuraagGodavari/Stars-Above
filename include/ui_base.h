@@ -24,6 +24,8 @@ typedef struct
 
 	UI_Object* top;
 
+	int size;
+
 	int x_spacing;
 	int y_spacing;
 
@@ -55,6 +57,11 @@ UI_Arrangement* ui_arr_new(UI_Object* root, int x_spacing, int y_spacing);
 * @brief Add a new UI Object to the arrangement
 */
 void ui_arr_add(UI_Arrangement* self, UI_Object* new_ui);
+
+/*
+* @brief Used for iterating through a UI Arrangement's objects
+*/
+//UI_Object* ui_arr_list(UI_Arrangement* self, int index);
 
 /*
 * @brief free a UI_Arrangement

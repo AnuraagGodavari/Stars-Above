@@ -77,9 +77,9 @@ UI_Arrangement* ui_arr_new(UI_Object* root, int x_spacing, int y_spacing)
 	self->x_spacing = x_spacing;
 	self->y_spacing = y_spacing;
 
-	if (!root) self->top = NULL;
+	if (!root) { self->top = NULL; self->size = 0; }
 
-	else self->top = root;
+	else { self->top = root; self->size = 1; }
 
 	return self;
 }
@@ -106,9 +106,30 @@ void ui_arr_add(UI_Arrangement* self, UI_Object* new_ui)
 	{
 		ui_object_add(self->top, new_ui, self->x_spacing, self->y_spacing);
 	}
+
+	self->size++;
 }
 
 void ui_arr_free(UI_Arrangement* self)
 {
+	UI_Object* curr;
+	UI_Object* next;
 
+	if (!self)
+	{
+		slog("Cannot free null UI Arrangement"); return;
+	}
+
+	curr = self->top;
+	next = curr->next;
+
+	while (curr != NULL)
+	{
+		ui_object_free(curr);
+
+		curr = next;
+		next = curr->next;
+	}
+
+	memset(&self, 0, sizeof(UI_Arrangement));
 }

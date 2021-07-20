@@ -56,7 +56,7 @@ typedef struct Entity_s
 /*
 * @brief Initialize the entity manager
 */
-void entity_manager_init(Uint32 max_entities);
+void entity_manager_init(Uint32 max_entities, Uint32 max_ui);
 
 /*
 * @brief Free the entity manager
@@ -73,7 +73,7 @@ Entity* entities_clickable(Vector2D mousepos);
 /*
 * @brief Draw all entities in the entity manager
 */
-void entities_draw();
+void all_entities_draw();
 
 
 /*
@@ -81,7 +81,7 @@ void entities_draw();
 * @param collidertype What kind of collider (circle or square)
 * @param is_ingameobject If the entity belongs to something that exists in the ingame world (otherwise it is something like UI)
 */
-Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertype, short is_ingameobject, short is_hidden);
+Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertype, short is_ingameobject, short is_hidden, short is_clickable);
 
 /*
 * @brief Add text to an entity with a particular position.

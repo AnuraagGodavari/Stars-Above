@@ -9,13 +9,16 @@ typedef struct
 	Uint32 max_entities;
 	Entity* entities;
 
+	Uint32 max_ui;
+	Entity* ui_list;
+
 } Entity_Manager;
 
 Entity_Manager entity_manager = { 0 };
 
 //Entity manager code
 
-void entity_manager_init(Uint32 max_entities)
+void entity_manager_init(Uint32 max_entities, Uint32 max_ui)
 {
 	int i;
 
@@ -24,11 +27,29 @@ void entity_manager_init(Uint32 max_entities)
 		slog("Entity Manager cannot be initialized with non-positive value"); return;
 	}
 
+	if (max_ui <= 0)
+	{
+		slog("Entity Manager cannot be initialized with non-positive value"); return;
+	}
+
+
+	//Entities Layer
+
 	entity_manager.max_entities = max_entities;
 
 	entity_manager.entities = malloc(sizeof(Entity) * max_entities);
 
 	for (i = 0; i < max_entities; i++) entity_manager.entities[i]._inuse = 0;
+
+
+	//UI Layer
+
+	entity_manager.max_ui = max_ui;
+
+	entity_manager.ui_list = malloc(sizeof(Entity) * max_ui);
+
+	for (i = 0; i < max_ui; i++) entity_manager.ui_list[i]._inuse = 0;
+
 
 	entity_manager._initialized = 1;
 
@@ -39,6 +60,10 @@ void entity_manager_free()
 {
 	if (entity_manager.entities != NULL) {
 		free(entity_manager.entities);
+	}
+
+	if (entity_manager.ui_list != NULL) {
+		free(entity_manager.ui_list);
 	}
 
 	if (entity_manager._initialized == 0)
@@ -52,7 +77,7 @@ void entity_manager_free()
 
 //Multiple Entities
 
-Entity* entity_new()
+Entity* entity_new(short is_ingameobject)
 {
 	int i;
 
@@ -61,11 +86,25 @@ Entity* entity_new()
 		slog("Entity Manager does not exist"); return;
 	}
 
-	for (i = 0; i < entity_manager.max_entities; i++)
+	if (is_ingameobject)
 	{
-		if (entity_manager.entities[i]._inuse == 0)
+		for (i = 0; i < entity_manager.max_entities; i++)
 		{
-			return &entity_manager.entities[i];
+			if (entity_manager.entities[i]._inuse == 0)
+			{
+				return &entity_manager.entities[i];
+			}
+		}
+	}
+
+	else
+	{
+		for (i = 0; i < entity_manager.max_ui; i++)
+		{
+			if (entity_manager.ui_list[i]._inuse == 0)
+			{
+				return &entity_manager.ui_list[i];
+			}
 		}
 	}
 
@@ -79,6 +118,20 @@ Entity* entities_clickable(Vector2D mousepos)
 	if (entity_manager._initialized == 0)
 	{
 		slog("Entity Manager does not exist"); return NULL;
+	}
+
+	for (i = 0; i < entity_manager.max_ui; i++)
+	{
+		if (entity_manager.ui_list[i]._inuse != 0)
+		{
+			if (entity_manager.ui_list[i]._hidden == 0)
+			{
+				if (entity_clickable(&entity_manager.ui_list[i], mousepos))
+				{
+					return &entity_manager.ui_list[i];
+				}
+			}
+		}
 	}
 
 	for (i = 0; i < entity_manager.max_entities; i++)
@@ -98,7 +151,7 @@ Entity* entities_clickable(Vector2D mousepos)
 	return NULL;
 }
 
-void entities_draw()
+void all_entities_draw()
 {
 	int i;
 
@@ -114,11 +167,19 @@ void entities_draw()
 			entity_draw(&entity_manager.entities[i]);
 		}
 	}
+
+	for (i = 0; i < entity_manager.max_ui; i++)
+	{
+		if (entity_manager.ui_list[i]._inuse != 0)
+		{
+			entity_draw(&entity_manager.ui_list[i]);
+		}
+	}
 }
 
 //Individual Entity struct code
 
-Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertype, short is_ingameobject, short is_hidden)
+Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertype, short is_ingameobject, short is_hidden, short is_clickable)
 {
 	int i;
 
@@ -132,7 +193,7 @@ Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertyp
 
 	//Allocate the new entity and assign its sprite and position
 
-	entity = entity_new();
+	entity = entity_new(is_ingameobject);
 
 	if (entity == NULL)
 	{
@@ -156,6 +217,13 @@ Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertyp
 	if (is_hidden == 0) { entity->_hidden = 0; }
 
 	else { entity->_hidden = 1; }
+
+
+	//Set whether or not this entity is clickable
+
+	if (is_clickable == 0) { entity->_clickable = 0; }
+
+	else { entity->_clickable = 1; }
 
 
 	//Set the entity collider type
@@ -354,6 +422,8 @@ int entity_clickable(Entity* self, Vector2D mousepos)
 	{
 		slog("Cannot check if NULL entity is clickable!"); return 0;
 	}
+
+	if (self->_clickable == 0) return 0;
 
 	if (self->colliderbox)
 	{

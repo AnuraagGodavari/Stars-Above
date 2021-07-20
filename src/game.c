@@ -17,7 +17,8 @@ void testing()
                 vector2d(10, 10),
                 COLL_BOX,
                 0,
-                0
+                0,
+                1
             )
         ),
         0,
@@ -36,7 +37,8 @@ void testing()
                 vector2d(0, 0),
                 COLL_BOX,
                 0,
-                0
+                0,
+                1
             )
         )
     );
@@ -104,7 +106,7 @@ int main(int argc, char* argv[])
     camera_init(vector2d(0, 0), gamedata.screensize, vector2d(2, 2));
 
     //Initialize Entity Manager
-    entity_manager_init(100);
+    entity_manager_init(100, 100);
 
     //Initialize Font System
     font_init(50);
@@ -131,7 +133,7 @@ int main(int argc, char* argv[])
 
         game_loop();
 
-        entities_draw();//if (test != NULL) { entity_draw(test); }
+        all_entities_draw();//if (test != NULL) { entity_draw(test); }
 
         mouse_update(mouse_idle, mouse_click, mouse_drag);
         
