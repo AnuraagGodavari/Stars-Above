@@ -9,11 +9,11 @@
 #include "simple_logger.h"
 #include "gfc_types.h"
 
+#include "gameresources.h"
+
 #include "collision.h"
 #include "camera.h"
 #include "text.h"
-
-typedef void(*clickfunc)(void* self_void);
 
 typedef struct Entity_s
 {
@@ -39,8 +39,7 @@ typedef struct Entity_s
 
 	void (*draw) (struct Entity_s* self, Camera* cam);
 
-	//Points to a function belonging to Entity->parent, which will convert the void pointer to a type pointer.
-	//void (*onClick) (void* self_void);
+	Game_Event* click_event;
 
 	void (*free) (struct Entity_s* self);
 
@@ -74,7 +73,7 @@ void all_entities_draw();
 * @param collidertype What kind of collider (circle or square)
 * @param is_ingameobject If the entity belongs to something that exists in the ingame world (otherwise it is something like UI)
 */
-Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertype, short is_ingameobject, short is_hidden, short is_clickable);
+Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertype, short is_ingameobject, short is_hidden);
 
 /*
 * @brief Add text to an entity with a particular position.
@@ -88,9 +87,9 @@ void entity_add_text_pos(Entity* self, char text[256], Font* font, Vector2D pos)
 void entity_add_text(Entity* self, char text[256], Font* font);
 
 /*
-* @brief Allow an entity to be clicked and tie it to a click function.
+* @brief Allow an entity to be clicked and tie it to a Game Event.
 */
-//void entity_add_clickfunction(Entity* self, clickfunc clickfunc);
+void entity_add_clickevent(Entity* self, Game_Event* game_event);
 
 /*
 * @brief Draw the entity to the screen relative to the position of the camera
@@ -101,6 +100,11 @@ void entity_draw(Entity* self);
 * @brief Draw the entity to the screen relative to the position of the camera
 */
 int entity_clickable(Entity* self, Vector2D mousepos);
+
+/*
+* @brief Trigger the click event for an entity.
+*/
+void entity_onClick(Entity* self);
 
 /*
 * @brief Free the entity struct

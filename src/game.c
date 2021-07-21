@@ -7,41 +7,60 @@ int done = 0;
 void testing()
 {
     //TEST
-    UI_Arrangement* test_ui;
-    Entity* test_ent;
+    UI_Arrangement* test_uiArr;
+    Entity* test_uiObj;
 
     /* ui test BEGIN*/
-    test_ui = ui_arr_new(
+
+    test_uiObj = entity_init
+    (
+        gf2d_sprite_load_image("resources/images/ui/textbox_brown.png"),
+        vector2d(10, 10),
+        COLL_BOX,
+        0,
+        0
+    );
+
+    entity_add_clickevent(test_uiObj, game_event_new(
+        test_uiObj,
+        NULL,
+        (int)command_game_TEST,
+        0,
+        NULL
+    ));
+
+    test_uiArr = ui_arr_new(
         ui_object_new(
-            entity_init
-            (
-                gf2d_sprite_load_image("resources/images/ui/textbox_brown.png"),
-                vector2d(10, 10),
-                COLL_BOX,
-                0,
-                0,
-                1
-            )
+            test_uiObj
         ),
         0,
         10
     );
 
-    entity_add_text(test_ui->top->ent, "TESTING ONE TWO THREE", font_load("resources/fonts/futura light bt.ttf", 16));
+    entity_add_text(test_uiArr->top->ent, "TESTING ONE TWO THREE", font_load("resources/fonts/futura light bt.ttf", 16));
+
+    test_uiObj = entity_init
+    (
+        gf2d_sprite_load_image("resources/images/ui/textbox_brown.png"),
+        vector2d(0, 0),
+        COLL_BOX,
+        0,
+        0
+    );
+
+    entity_add_clickevent(test_uiObj, game_event_new(
+        test_uiObj,
+        NULL, 
+        (int)command_game_TEST,
+        0, 
+        NULL
+    ));
 
     //*
     ui_arr_add(
-        test_ui,
+        test_uiArr,
         ui_object_new(
-            entity_init
-            (
-                gf2d_sprite_load_image("resources/images/ui/textbox_brown.png"),
-                vector2d(0, 0),
-                COLL_BOX,
-                0,
-                0,
-                1
-            )
+            test_uiObj
         )
     );
 
@@ -157,6 +176,11 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+void game_recieve_event(Game_Event* event)
+{
+    slog("ASD");
+}
+
 void sdl_event()
 {
     SDL_Event e;
@@ -174,7 +198,7 @@ void sdl_event()
             {
                 if (gamedata.hovering_ent)
                 {
-                    slog("ASD");
+                    entity_onClick(gamedata.hovering_ent);
                 }
             }
 

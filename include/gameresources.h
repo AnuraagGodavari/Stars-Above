@@ -8,11 +8,13 @@
 #include "simple_logger.h"
 #include "gfc_types.h"
 
-#include "entity.h"
+typedef struct Game_Event_t;
+
+typedef void (*reciever_func)(void* self_void, struct Game_Event_t* game_event);
 
 typedef struct Menu_State;
 
-typedef struct Game_Event_t
+typedef struct
 {
 	void* actor;
 	void* target;
@@ -21,16 +23,20 @@ typedef struct Game_Event_t
 
 	int qty;
 
-	(Menu_State*) menustate_generate(void* self);
+	short _gamewide;
 
-	(void) reciever(void* self);
+	struct Menu_State (*menustate_generate) (void* self);
 
-	Game_Event_t* sub_event;
+	reciever_func reciever;
+
+	struct Game_Event_t* sub_event;
 
 
 } Game_Event;
 
-Game_Event* game_event_new(void* actor, void* target, int command, int qty);
+Game_Event* game_event_new(void* actor, void* target, int command, int qty, reciever_func* reciever);
+
+void game_event_trigger(Game_Event* game_event);
 
 void game_event_free(Game_Event* self);
 

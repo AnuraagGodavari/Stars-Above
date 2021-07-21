@@ -9,11 +9,18 @@
 #include "simple_logger.h"
 #include "gfc_types.h"
 
+#include "gameresources.h"
+
 #include "camera.h"
 #include "text.h"
 
 #include "entity.h"
 #include "ui_base.h"
+
+typedef enum game_commands
+{
+	command_game_TEST
+};
 
 typedef struct 
 {
@@ -24,11 +31,17 @@ typedef struct
 
 } Game_Data;
 
+/* Main game stuff */
+
 void game_prepare();
 
 void game_load(char* savefile);
 
 void game_loop();
+
+/* Other game stuff */
+
+void game_recieve_event(Game_Event* event);
 
 /* Mouse Stuff */
 

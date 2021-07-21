@@ -179,7 +179,7 @@ void all_entities_draw()
 
 //Individual Entity struct code
 
-Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertype, short is_ingameobject, short is_hidden, short is_clickable)
+Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertype, short is_ingameobject, short is_hidden)
 {
 	int i;
 
@@ -217,13 +217,6 @@ Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertyp
 	if (is_hidden == 0) { entity->_hidden = 0; }
 
 	else { entity->_hidden = 1; }
-
-
-	//Set whether or not this entity is clickable
-
-	if (is_clickable == 0) { entity->_clickable = 0; }
-
-	else { entity->_clickable = 1; }
 
 
 	//Set the entity collider type
@@ -299,6 +292,11 @@ void entity_add_text_pos(Entity* self, char text[256], Font* font, Vector2D pos)
 
 void entity_add_text(Entity* self, char text[256], Font* font)
 {
+	if (!self)
+	{
+		slog("Cannot add text to an NULL entity"); return;
+	}
+
 	if (!text)
 	{
 		slog("Cannot add NULL text to an entity"); return;
@@ -314,6 +312,23 @@ void entity_add_text(Entity* self, char text[256], Font* font)
 			self->sprite->frame_h * 0.2,
 			(self->sprite->frame_h - font->ptsize) / 2
 		));
+}
+
+void entity_add_clickevent(Entity* self, Game_Event* game_event)
+{
+	if (!self)
+	{
+		slog("Cannot add event to a NULL entity"); return;
+	}
+
+	if (!game_event)
+	{
+		slog("Cannot add NULL event to an entity"); return;
+	}
+
+	self->_clickable = 1;
+
+	self->click_event = game_event;
 }
 
 void entity_draw(Entity* self)
@@ -442,6 +457,16 @@ int entity_clickable(Entity* self, Vector2D mousepos)
 	}
 
 	return 0;
+}
+
+void entity_onClick(Entity* self)
+{
+	if (!self)
+	{
+		slog("Cannot click on a NULL entity!"); return;
+	}
+
+	slog("ASD");
 }
 
 void entity_free(Entity* self)
