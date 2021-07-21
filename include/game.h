@@ -32,12 +32,12 @@ void game_loop();
 
 /* Mouse Stuff */
 
-Bool mouse_clickable();
-
 void mouse_update(Sprite* idle, Sprite* hover, Sprite* drag);
 
 /* Controller Stuff */
 
 void process_keys();
+
+void sdl_event();
 
 #endif

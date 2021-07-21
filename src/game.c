@@ -2,6 +2,8 @@
 
 Game_Data gamedata = { 0 };
 
+int done = 0;
+
 void testing()
 {
     //TEST
@@ -59,8 +61,6 @@ void game_loop()
 
 int main(int argc, char* argv[])
 {
-
-    int done = 0;
     const Uint8* keys;
 
     SDL_Event sdlevent;
@@ -144,14 +144,8 @@ int main(int argc, char* argv[])
 
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
 
-        while (SDL_PollEvent(&sdlevent))
-        {
-            if (sdlevent.type == SDL_QUIT)
-            {
-                done = 1;
-            }
-
-        }
+        //Poll SDL Events
+        sdl_event();
         
         //slog("Rendering at %f FPS", gf2d_graphics_get_frames_per_second());
     }
@@ -163,9 +157,31 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-Bool mouse_clickable()
+void sdl_event()
 {
+    SDL_Event e;
+    while (SDL_PollEvent(&e)) {
 
+        switch (e.type) {
+
+        case SDL_QUIT:
+            done = 1;
+            break;
+
+        case SDL_MOUSEBUTTONDOWN:
+
+            if (e.button.button == SDL_BUTTON_LEFT)
+            {
+                if (gamedata.hovering_ent)
+                {
+                    slog("ASD");
+                }
+            }
+
+            break;
+
+        }
+    }
 }
 
 void mouse_update(Sprite* idle, Sprite* hover, Sprite* drag)

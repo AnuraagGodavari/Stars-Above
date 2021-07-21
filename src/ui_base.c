@@ -2,6 +2,8 @@
 
 #include "ui_base.h"
 
+//UI Object Code
+
 UI_Object* ui_object_new(Entity* entity)
 {
 
@@ -57,7 +59,21 @@ void ui_object_add(UI_Object* self, UI_Object* new_ui, int x_spacing, int y_spac
 		vector2d_copy(new_ui->ent->colliderbox->viewpos, new_ui->ent->pos);
 	}
 
+	new_ui->parent = self->parent;
+
 	self->next = new_ui;
+}
+
+void ui_object_click_reciever(void* self_void)
+{
+	UI_Object* self;
+
+	if (self == NULL)
+	{
+		slog("Cannot perform click actions on a NULL UI Object!");
+	}
+
+	self = (UI_Object*)self_void;
 }
 
 void ui_object_free(UI_Object* self)
@@ -66,6 +82,8 @@ void ui_object_free(UI_Object* self)
 
 	memset(&self, 0, sizeof(UI_Object));
 }
+
+//UI Arrangement Code
 
 UI_Arrangement* ui_arr_new(UI_Object* root, int x_spacing, int y_spacing)
 {
@@ -79,7 +97,7 @@ UI_Arrangement* ui_arr_new(UI_Object* root, int x_spacing, int y_spacing)
 
 	if (!root) { self->top = NULL; self->size = 0; }
 
-	else { self->top = root; self->size = 1; }
+	else { self->top = root; self->top->parent = self; self->size = 1; }
 
 	return self;
 }

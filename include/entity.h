@@ -13,14 +13,7 @@
 #include "camera.h"
 #include "text.h"
 
-/*typedef enum Parent_Type
-{
-
-	ENT_UI,
-	ENT_STAR,
-	ENT_PLANET
-
-} Parent_Type;*/
+typedef void(*clickfunc)(void* self_void);
 
 typedef struct Entity_s
 {
@@ -47,7 +40,7 @@ typedef struct Entity_s
 	void (*draw) (struct Entity_s* self, Camera* cam);
 
 	//Points to a function belonging to Entity->parent, which will convert the void pointer to a type pointer.
-	void (*onClick) (void* self_void);
+	//void (*onClick) (void* self_void);
 
 	void (*free) (struct Entity_s* self);
 
@@ -93,6 +86,11 @@ void entity_add_text_pos(Entity* self, char text[256], Font* font, Vector2D pos)
 * @brief Add text to an entity with an automatically determined position.
 */
 void entity_add_text(Entity* self, char text[256], Font* font);
+
+/*
+* @brief Allow an entity to be clicked and tie it to a click function.
+*/
+//void entity_add_clickfunction(Entity* self, clickfunc clickfunc);
 
 /*
 * @brief Draw the entity to the screen relative to the position of the camera

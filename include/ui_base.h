@@ -10,6 +10,8 @@
 
 #include "entity.h"
 
+typedef struct UI_Arrangement_s;
+
 typedef struct UI_Object_s
 {
 
@@ -17,9 +19,11 @@ typedef struct UI_Object_s
 
 	struct UI_Object_s* next;
 
+	struct UI_Arrangement_s* parent;
+
 } UI_Object;
 
-typedef struct
+typedef struct UI_Arrangement_s
 {
 
 	UI_Object* top;
@@ -42,6 +46,12 @@ UI_Object* ui_object_new(Entity* entity);
 * @param new_ui UI_Object to add
 */
 void ui_object_add(UI_Object* self, UI_Object* new_ui, int x_spacing, int y_spacing);
+
+/*
+* @brief Do actions on a UI Object being clicked
+* @param self_void A void pointer to the UI object
+*/
+void ui_object_click_reciever(void* self_void);
 
 /*
 * @brief free a UI_Object
