@@ -12,7 +12,13 @@ typedef struct Game_Event_t;
 
 typedef void (*reciever_func)(void* self_void, struct Game_Event_t* game_event);
 
-typedef struct Menu_State;
+typedef struct UI_State;
+
+/*
+* @brief Generate a new UI State (Menu)
+* @param self The object you are making a UI State for
+*/
+typedef struct UI_State(*uiState_generator) (void* self, struct Game_Event_t* gameEvent_prev);
 
 typedef struct
 {
@@ -25,7 +31,12 @@ typedef struct
 
 	short _gamewide;
 
-	struct Menu_State (*menustate_generate) (void* self);
+	struct UI_State* uiState;
+
+	uiState_generator uiState_next;
+
+	uiState_generator uiState_previous;
+	void* prev_actor;
 
 	reciever_func reciever;
 
@@ -34,12 +45,13 @@ typedef struct
 
 } Game_Event;
 
-Game_Event* game_event_new(void* actor, void* target, int command, int qty, reciever_func* reciever);
+Game_Event* game_event_new(void* actor, void* target, int command, int qty, reciever_func* reciever, struct UI_State* uiState, uiState_generator uiState_next);
 
 void game_event_trigger(Game_Event* game_event);
 
 void game_event_free(Game_Event* self);
 
 
+struct UI_State* game_event_getUIState(Game_Event* self);
 
 #endif

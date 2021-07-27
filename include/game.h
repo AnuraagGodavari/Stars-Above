@@ -29,6 +29,8 @@ typedef struct
 
 	Entity* hovering_ent;
 
+	UI_State* uiState_current;
+
 } Game_Data;
 
 /* Main game stuff */

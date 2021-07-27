@@ -64,21 +64,11 @@ void ui_object_add(UI_Object* self, UI_Object* new_ui, int x_spacing, int y_spac
 	self->next = new_ui;
 }
 
-void ui_object_click_reciever(void* self_void)
-{
-	UI_Object* self;
-
-	if (self == NULL)
-	{
-		slog("Cannot perform click actions on a NULL UI Object!");
-	}
-
-	self = (UI_Object*)self_void;
-}
-
 void ui_object_free(UI_Object* self)
 {
 	if (self->ent) entity_free(self->ent);
+
+	if (self->next) ui_object_free(self->next);
 
 	memset(&self, 0, sizeof(UI_Object));
 }
@@ -138,9 +128,11 @@ void ui_arr_free(UI_Arrangement* self)
 		slog("Cannot free null UI Arrangement"); return;
 	}
 
+	ui_object_free(self->top);
+
+	/*
 	curr = self->top;
 	next = curr->next;
-
 	while (curr != NULL)
 	{
 		ui_object_free(curr);
@@ -148,6 +140,96 @@ void ui_arr_free(UI_Arrangement* self)
 		curr = next;
 		next = curr->next;
 	}
+	*/
 
 	memset(&self, 0, sizeof(UI_Arrangement));
+}
+
+//UI State Code
+
+UI_State * ui_state_new(Uint32 num_arrs, void* self_parent, uiState_generator self_generator, void* prev_parent, uiState_generator prev_generator)
+{
+	int i;
+	UI_State* self;
+
+	if (num_arrs <= 0)
+	{
+		slog("Cannot make a UI State that holds 0 arrangements"); return NULL;
+	}
+
+	/*
+	if (!self_parent)
+	{
+		slog("Cannot add NULL parent pointer to UI State"); return NULL;
+	}
+	*/
+
+	if (!self_generator)
+	{
+		slog("Cannot add NULL parent generator to UI State"); return NULL;
+	}
+
+	self = malloc(sizeof(UI_State));
+
+	self->num_arrs = num_arrs;
+	self->arrs = malloc(sizeof(UI_Arrangement*) * num_arrs);
+
+	self->self_parent = self_parent;
+	self->self_generator = self_generator;
+
+	self->prev_parent = prev_parent;
+	self->prev_generator = prev_generator;
+
+	for (i = 0; i < self->num_arrs; i++)
+	{
+		self->arrs[i] = NULL;
+	}
+
+	return self;
+}
+
+void ui_state_pushback(UI_State* self, UI_Arrangement* ui_arr)
+{
+	int i;
+	
+	if (!self)
+	{
+		slog("Cannot add UI_Arrangement to NULL UI_State"); return;
+	}
+
+	if (!ui_arr)
+	{
+		slog("Cannot add NULL UI_Arrangement to UI_State"); return;
+	}
+
+	for (i = 0; i < self->num_arrs; i++)
+	{
+		if (self->arrs[i] == NULL)
+		{
+			self->arrs[i] = ui_arr;
+			return;
+		}
+	}
+
+	slog("Not enough spaces for new UI Arrangement"); return;
+}
+
+void ui_state_free(UI_State* self)
+{
+	int i;
+
+	if (!self)
+	{
+		slog("Cannot free NULL UI_State"); return;
+	}
+
+	for (i = 0; i < self->num_arrs; i++)
+	{
+		if (self->arrs[i] != NULL)
+		{
+			ui_arr_free(self->arrs[i]);
+		}
+	}
+	memset(&self, 0, sizeof(UI_State));
+
 }

@@ -4,14 +4,27 @@ Game_Data gamedata = { 0 };
 
 int done = 0;
 
-void testing()
+void test_ui(void* self, Game_Event* gameEvent_prev)
 {
-    //TEST
+    UI_State* test_uiState;
     UI_Arrangement* test_uiArr;
     Entity* test_uiObj;
 
-    /* ui test BEGIN*/
+    time_t t;
+    srand((unsigned)time(&t));
 
+    /* ui test BEGIN*/
+    
+    //Create new UI State
+    test_uiState = ui_state_new(
+        5,
+        NULL,
+        test_ui,
+        NULL,
+        NULL
+    );
+
+    //Add first button
     test_uiObj = entity_init
     (
         gf2d_sprite_load_image("resources/images/ui/textbox_brown.png"),
@@ -26,9 +39,12 @@ void testing()
         NULL,
         (int)command_game_TEST,
         0,
-        NULL
+        NULL,
+        test_uiState,
+        test_ui
     ));
 
+    //Create UI Arr with first button
     test_uiArr = ui_arr_new(
         ui_object_new(
             test_uiObj
@@ -37,8 +53,11 @@ void testing()
         10
     );
 
+    ui_state_pushback(test_uiState, test_uiArr);
+
     entity_add_text(test_uiArr->top->ent, "TESTING ONE TWO THREE", font_load("resources/fonts/futura light bt.ttf", 16));
 
+    //Add second button
     test_uiObj = entity_init
     (
         gf2d_sprite_load_image("resources/images/ui/textbox_brown.png"),
@@ -48,24 +67,27 @@ void testing()
         0
     );
 
+    char temp[128];
+    sprintf(temp, "RANDOM NUMER %d", rand() % 5000);
+
+    entity_add_text(test_uiObj, temp, font_load("resources/fonts/futura light bt.ttf", 16));
+
     entity_add_clickevent(test_uiObj, game_event_new(
         test_uiObj,
         NULL, 
         (int)command_game_TEST,
         0, 
-        NULL
+        NULL,
+        test_uiState,
+        test_ui
     ));
 
-    //*
     ui_arr_add(
         test_uiArr,
         ui_object_new(
             test_uiObj
         )
     );
-
-    //*/
-    /* ui test END*/
 }
 
 Bool clickable()
@@ -133,7 +155,7 @@ int main(int argc, char* argv[])
     parallax0 = parallax_init(gf2d_sprite_load_image("resources/images/background/bg_overlay.png"), vector2d(0, 0), 0.5);
     parallax1 = parallax_init(gf2d_sprite_load_image("resources/images/background/bg_overlay_02.png"), vector2d(0, 0), 0.2);
 
-    testing();
+    test_ui(NULL, NULL);
 
     /*main game loop*/
     while (!done)
@@ -176,9 +198,18 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-void game_recieve_event(Game_Event* event)
+void game_recieve_event(Game_Event* gameEvent)
 {
-    slog("ASD");
+
+    if (!gameEvent)
+    {
+        slog("Cannot recieve NULL Game Event"); return;
+    }
+
+    if (gameEvent->event_command == (int)command_game_TEST)
+    {
+        slog("GAME EVENT COMAMAND == command_game_TEST");
+    }
 }
 
 void sdl_event()

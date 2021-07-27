@@ -466,12 +466,12 @@ void entity_onClick(Entity* self)
 		slog("Cannot click on a NULL entity!"); return;
 	}
 
-	slog("ASD");
+	if (self->click_event)
+		game_event_trigger(self->click_event);
 }
 
 void entity_free(Entity* self)
 {
-
 	if (!self)
 	{
 		slog("Cannot free NULL entity!"); return;
@@ -485,6 +485,11 @@ void entity_free(Entity* self)
 	if (self->collidercircle != NULL)
 	{
 		circle_free(self->collidercircle);
+	}
+
+	if (self->click_event != NULL)
+	{
+		game_event_free(self->click_event);
 	}
 
 	self->_inuse = 0;

@@ -67,7 +67,6 @@ Entity* entities_clickable(Vector2D mousepos);
 */
 void all_entities_draw();
 
-
 /*
 * @brief Initialize a visualizable entity.
 * @param collidertype What kind of collider (circle or square)

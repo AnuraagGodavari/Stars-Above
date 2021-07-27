@@ -4,18 +4,13 @@
 
 #include "game.h"
 
-Game_Event* game_event_new(void* actor, void* target, int command, int qty, reciever_func* reciever)
+Game_Event* game_event_new(void* actor, void* target, int command, int qty, reciever_func* reciever, UI_State* uiState, uiState_generator uiState_next)
 {
 	Game_Event* self;
 
 	if (!actor)
 	{
-		slog("Cannot make game event with NULL actor"); return;
-	}
-
-	if (!reciever)
-	{
-		slog("Cannot make game event with NULL reciever function"); return;
+		slog("Cannot make game event with NULL actor"); return NULL;
 	}
 
 	self = malloc(sizeof(Game_Event));
@@ -30,9 +25,14 @@ Game_Event* game_event_new(void* actor, void* target, int command, int qty, reci
 
 	self->reciever = reciever;
 
-	if (target) self->_gamewide = 1;
+	self->uiState = uiState;
+	self->uiState_next = uiState_next;
 
-	else self->_gamewide = 0;
+	if (target) { self->_gamewide = 0; }
+
+	else { self->_gamewide = 1; }
+
+	return self;
 
 }
 
@@ -53,5 +53,27 @@ void game_event_trigger(Game_Event* self)
 	{
 		self->reciever(self->target, self);
 	}
+
+	if (self->uiState_next)
+	{
+		self->uiState_next(self->target, self);
+	}
+
+	ui_state_free(self->uiState);
 	
+}
+
+void game_event_free(Game_Event* self)
+{
+	if (!self)
+	{
+		slog("Cannot free NULL Game Event"); return;
+	}
+
+	memset(&self, 0, sizeof(Game_Event));
+}
+
+UI_State* game_event_getUIState(Game_Event* self)
+{
+	return self->uiState;
 }
