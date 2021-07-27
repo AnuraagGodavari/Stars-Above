@@ -4,7 +4,7 @@ Game_Data gamedata = { 0 };
 
 int done = 0;
 
-void test_ui(void* self, Game_Event* gameEvent_prev)
+UI_State* test_ui(void* self, Game_Event* gameEvent_prev)
 {
     UI_State* test_uiState;
     UI_Arrangement* test_uiArr;
@@ -21,8 +21,10 @@ void test_ui(void* self, Game_Event* gameEvent_prev)
         NULL,
         test_ui,
         NULL,
-        NULL
+        test_ui
     );
+
+    test_uiState->prev_game_event = gameEvent_prev;
 
     //Add first button
     test_uiObj = entity_init
@@ -68,7 +70,7 @@ void test_ui(void* self, Game_Event* gameEvent_prev)
     );
 
     char temp[128];
-    sprintf(temp, "RANDOM NUMER %d", rand() % 5000);
+    sprintf(temp, "RANDOM NUMBER %d", rand() % 5000);
 
     entity_add_text(test_uiObj, temp, font_load("resources/fonts/futura light bt.ttf", 16));
 
@@ -88,6 +90,8 @@ void test_ui(void* self, Game_Event* gameEvent_prev)
             test_uiObj
         )
     );
+
+    return test_uiState;
 }
 
 Bool clickable()
@@ -155,7 +159,7 @@ int main(int argc, char* argv[])
     parallax0 = parallax_init(gf2d_sprite_load_image("resources/images/background/bg_overlay.png"), vector2d(0, 0), 0.5);
     parallax1 = parallax_init(gf2d_sprite_load_image("resources/images/background/bg_overlay_02.png"), vector2d(0, 0), 0.2);
 
-    test_ui(NULL, NULL);
+    gamedata.uiState_curr = test_ui(NULL, NULL);
 
     /*main game loop*/
     while (!done)
@@ -208,16 +212,26 @@ void game_recieve_event(Game_Event* gameEvent)
 
     if (gameEvent->event_command == (int)command_game_TEST)
     {
-        slog("GAME EVENT COMAMAND == command_game_TEST");
+        slog("GAME EVENT COMMAND == command_game_TEST");
     }
+}
+
+void game_set_ui_state(UI_State* ui_state)
+{
+    if (!ui_state)
+    {
+        slog("Cannot set game's current UI_State to NULL state"); return;
+    }
+
+    gamedata.uiState_curr = ui_state;
 }
 
 void sdl_event()
 {
-    SDL_Event e;
-    while (SDL_PollEvent(&e)) {
+    SDL_Event sdl_event;
+    while (SDL_PollEvent(&sdl_event)) {
 
-        switch (e.type) {
+        switch (sdl_event.type) {
 
         case SDL_QUIT:
             done = 1;
@@ -225,7 +239,7 @@ void sdl_event()
 
         case SDL_MOUSEBUTTONDOWN:
 
-            if (e.button.button == SDL_BUTTON_LEFT)
+            if (sdl_event.button.button == SDL_BUTTON_LEFT)
             {
                 if (gamedata.hovering_ent)
                 {
@@ -234,6 +248,13 @@ void sdl_event()
             }
 
             break;
+
+        case SDL_KEYDOWN:
+
+            if (sdl_event.key.keysym.sym == SDLK_BACKSPACE)
+            {
+                gamedata.uiState_curr = previous_ui_state(gamedata.uiState_curr);
+            }
 
         }
     }

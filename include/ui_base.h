@@ -52,6 +52,8 @@ typedef struct UI_State
 
 	void* prev_parent;
 	uiState_generator prev_generator;
+	Game_Event* prev_game_event;
+
 } UI_State;
 
 /*
@@ -70,6 +72,8 @@ void ui_object_add(UI_Object* self, UI_Object* new_ui, int x_spacing, int y_spac
 * @brief free a UI_Object
 */
 void ui_object_free(UI_Object* self);
+
+
 
 /*
 * @brief Create a new UI_Arrangement
@@ -91,6 +95,8 @@ void ui_arr_add(UI_Arrangement* self, UI_Object* new_ui);
 */
 void ui_arr_free(UI_Arrangement* self);
 
+
+
 /*
 * @brief Create a new UI State
 */
@@ -100,6 +106,11 @@ UI_State* ui_state_new(Uint32 num_arrs, void* self_parent, uiState_generator sel
 * @brief Push Ui_Arr to the UI_State
 */
 void ui_state_pushback(UI_State* self, UI_Arrangement* ui_arr);
+
+/*
+* @brief Go back one UI_State
+*/
+UI_State* previous_ui_state(UI_State* self);
 
 /*
 * @brief Free a UI_State

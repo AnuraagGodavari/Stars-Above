@@ -214,6 +214,50 @@ void ui_state_pushback(UI_State* self, UI_Arrangement* ui_arr)
 	slog("Not enough spaces for new UI Arrangement"); return;
 }
 
+UI_State* previous_ui_state(UI_State* self)
+{
+	UI_State* prev_uistate;
+	Game_Event* prev_event;
+
+	if (!self)
+	{
+		slog("Cannot go backwards from NULL UI State"); return NULL;
+	}
+
+	if (!self->prev_generator) { return self; }
+
+	//If self has no previous game_event
+	if (!self->prev_game_event) 
+	{
+		prev_uistate = self->prev_generator(NULL, self);
+		prev_uistate->prev_game_event = NULL;
+	}
+
+	else
+	{
+		prev_event = self->prev_game_event;
+
+		if (prev_event->target)
+			prev_uistate = self->prev_generator(self->prev_game_event->target, self);
+
+		else
+			prev_uistate = self->prev_generator(NULL, self);
+
+		//Set previous UI State's backwards game event
+
+		if (prev_event->prev_event)
+			prev_uistate->prev_game_event = game_event_copy(prev_event->prev_event);
+
+		else
+			prev_uistate->prev_game_event = NULL;
+	}
+
+	ui_state_free(self);
+
+	return prev_uistate;
+
+}
+
 void ui_state_free(UI_State* self)
 {
 	int i;

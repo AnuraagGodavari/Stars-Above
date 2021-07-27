@@ -32,12 +32,46 @@ Game_Event* game_event_new(void* actor, void* target, int command, int qty, reci
 
 	else { self->_gamewide = 1; }
 
+	self->sub_event = NULL;
+	self->prev_event = NULL;
+
 	return self;
 
 }
 
+Game_Event* game_event_copy(Game_Event* self)
+{
+	Game_Event* copy;
+
+	if (!self)
+	{
+		slog("Cannot make copy of NULL game event"); return NULL;
+	}
+
+	copy = game_event_new
+	(
+		self->actor,
+		self->target,
+		self->event_command,
+		self->qty,
+		self->reciever,
+		self->uiState,
+		self->uiState_next
+	);
+
+	if (self->sub_event)
+		copy->sub_event = game_event_copy(self->sub_event);
+
+	if (self->prev_event)
+		copy->prev_event = game_event_copy(self->prev_event);
+
+	return copy;
+}
+
 void game_event_trigger(Game_Event* self)
 {
+
+	UI_State* new_uistate;
 
 	if (!self)
 	{
@@ -56,7 +90,11 @@ void game_event_trigger(Game_Event* self)
 
 	if (self->uiState_next)
 	{
-		self->uiState_next(self->target, self);
+		new_uistate = self->uiState_next(self->target, self);
+
+		new_uistate->prev_game_event = game_event_copy(self);
+
+		game_set_ui_state(new_uistate);
 	}
 
 	ui_state_free(self->uiState);
@@ -65,10 +103,17 @@ void game_event_trigger(Game_Event* self)
 
 void game_event_free(Game_Event* self)
 {
+
 	if (!self)
 	{
 		slog("Cannot free NULL Game Event"); return;
 	}
+
+	if (self->sub_event)
+		game_event_free(self->sub_event);
+
+	if (self->prev_event)
+		game_event_free(self->prev_event);
 
 	memset(&self, 0, sizeof(Game_Event));
 }

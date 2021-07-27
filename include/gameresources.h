@@ -18,7 +18,7 @@ typedef struct UI_State;
 * @brief Generate a new UI State (Menu)
 * @param self The object you are making a UI State for
 */
-typedef struct UI_State(*uiState_generator) (void* self, struct Game_Event_t* gameEvent_prev);
+typedef struct UI_State* (*uiState_generator) (void* self, struct Game_Event_t* gameEvent_prev);
 
 typedef struct
 {
@@ -42,12 +42,15 @@ typedef struct
 
 	struct Game_Event_t* sub_event;
 
+	struct Game_Event_t* prev_event;
 
 } Game_Event;
 
 Game_Event* game_event_new(void* actor, void* target, int command, int qty, reciever_func* reciever, struct UI_State* uiState, uiState_generator uiState_next);
 
 void game_event_trigger(Game_Event* game_event);
+
+Game_Event* game_event_copy(Game_Event* self);
 
 void game_event_free(Game_Event* self);
 

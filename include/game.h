@@ -29,7 +29,7 @@ typedef struct
 
 	Entity* hovering_ent;
 
-	UI_State* uiState_current;
+	UI_State* uiState_curr;
 
 } Game_Data;
 
@@ -44,6 +44,8 @@ void game_loop();
 /* Other game stuff */
 
 void game_recieve_event(Game_Event* event);
+
+void game_set_ui_state(UI_State* ui_state);
 
 /* Mouse Stuff */
 
