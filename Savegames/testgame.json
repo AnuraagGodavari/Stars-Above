@@ -1,0 +1,40 @@
+{
+	
+	"Map":
+	{
+		
+		"System1":
+		{
+			"type": "Star System",
+			"coordinates": [100, 100],
+			"neighbors":
+			[
+				"System2"
+			]
+		},
+		
+		"System2":
+		{
+			"type": "Star System",
+			"coordinates": [200, 200],
+			"neighbors":
+			[
+				"System1",
+				"System3"
+			]
+		},
+		
+		"System3":
+		{
+			"type": "Star System",
+			"coordinates": [300, 300],
+			"neighbors":
+			[
+				"System2"
+			]
+		}
+		
+		
+	}
+	
+}

@@ -4,6 +4,11 @@ Game_Data gamedata = { 0 };
 
 int done = 0;
 
+void game_load(char* savefile)
+{
+
+}
+
 UI_State* test_ui(void* self, Game_Event* gameEvent_prev)
 {
     UI_State* test_uiState;
@@ -29,7 +34,7 @@ UI_State* test_ui(void* self, Game_Event* gameEvent_prev)
     //Add first button
     test_uiObj = entity_init
     (
-        gf2d_sprite_load_image("resources/images/ui/textbox_brown.png"),
+        gf2d_sprite_load_image("assets/images/ui/textbox_brown.png"),
         vector2d(10, 10),
         COLL_BOX,
         0,
@@ -57,12 +62,12 @@ UI_State* test_ui(void* self, Game_Event* gameEvent_prev)
 
     ui_state_pushback(test_uiState, test_uiArr);
 
-    entity_add_text(test_uiArr->top->ent, "TESTING ONE TWO THREE", font_load("resources/fonts/futura light bt.ttf", 16));
+    entity_add_text(test_uiArr->top->ent, "TESTING ONE TWO THREE", font_load("assets/fonts/futura light bt.ttf", 16));
 
     //Add second button
     test_uiObj = entity_init
     (
-        gf2d_sprite_load_image("resources/images/ui/textbox_brown.png"),
+        gf2d_sprite_load_image("assets/images/ui/textbox_brown.png"),
         vector2d(0, 0),
         COLL_BOX,
         0,
@@ -72,7 +77,7 @@ UI_State* test_ui(void* self, Game_Event* gameEvent_prev)
     char temp[128];
     sprintf(temp, "RANDOM NUMBER %d", rand() % 5000);
 
-    entity_add_text(test_uiObj, temp, font_load("resources/fonts/futura light bt.ttf", 16));
+    entity_add_text(test_uiObj, temp, font_load("assets/fonts/futura light bt.ttf", 16));
 
     entity_add_clickevent(test_uiObj, game_event_new(
         test_uiObj,
@@ -141,11 +146,11 @@ int main(int argc, char* argv[])
     SDL_ShowCursor(SDL_DISABLE);
 
     /*demo setup*/
-    background = gf2d_sprite_load_image("resources/images/background/bg_1600_900.png");
+    background = gf2d_sprite_load_image("assets/images/background/bg_1600_900.png");
 
-    mouse_idle = gf2d_sprite_load_all("resources/images/ui/cursor.png", 32, 32, 1);
-    mouse_click = gf2d_sprite_load_all("resources/images/ui/cursor_click.png", 32, 32, 1);
-    mouse_drag = gf2d_sprite_load_all("resources/images/ui/cursor_drag.png", 32, 32, 1);
+    mouse_idle = gf2d_sprite_load_all("assets/images/ui/cursor.png", 32, 32, 1);
+    mouse_click = gf2d_sprite_load_all("assets/images/ui/cursor_click.png", 32, 32, 1);
+    mouse_drag = gf2d_sprite_load_all("assets/images/ui/cursor_drag.png", 32, 32, 1);
 
     //Initialize Camera
     camera_init(vector2d(0, 0), gamedata.screensize, vector2d(2, 2));
@@ -156,10 +161,10 @@ int main(int argc, char* argv[])
     //Initialize Font System
     font_init(50);
 
-    parallax0 = parallax_init(gf2d_sprite_load_image("resources/images/background/bg_overlay.png"), vector2d(0, 0), 0.5);
-    parallax1 = parallax_init(gf2d_sprite_load_image("resources/images/background/bg_overlay_02.png"), vector2d(0, 0), 0.2);
+    parallax0 = parallax_init(gf2d_sprite_load_image("assets/images/background/bg_overlay.png"), vector2d(0, 0), 0.5);
+    parallax1 = parallax_init(gf2d_sprite_load_image("assets/images/background/bg_overlay_02.png"), vector2d(0, 0), 0.2);
 
-    gamedata.uiState_curr = test_ui(NULL, NULL);
+   // gamedata.uiState_curr = test_ui(NULL, NULL);
 
     /*main game loop*/
     while (!done)
@@ -253,7 +258,8 @@ void sdl_event()
 
             if (sdl_event.key.keysym.sym == SDLK_BACKSPACE)
             {
-                gamedata.uiState_curr = previous_ui_state(gamedata.uiState_curr);
+                if (gamedata.uiState_curr)
+                    gamedata.uiState_curr = previous_ui_state(gamedata.uiState_curr);
             }
 
         }
