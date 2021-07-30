@@ -9,13 +9,16 @@ typedef struct
 	Uint32 max_entities;
 	Entity* entities;
 
+	Uint32 max_ui;
+	Entity* ui_list;
+
 } Entity_Manager;
 
 Entity_Manager entity_manager = { 0 };
 
 //Entity manager code
 
-void entity_manager_init(Uint32 max_entities)
+void entity_manager_init(Uint32 max_entities, Uint32 max_ui)
 {
 	int i;
 
@@ -24,11 +27,29 @@ void entity_manager_init(Uint32 max_entities)
 		slog("Entity Manager cannot be initialized with non-positive value"); return;
 	}
 
+	if (max_ui <= 0)
+	{
+		slog("Entity Manager cannot be initialized with non-positive value"); return;
+	}
+
+
+	//Entities Layer
+
 	entity_manager.max_entities = max_entities;
 
 	entity_manager.entities = malloc(sizeof(Entity) * max_entities);
 
 	for (i = 0; i < max_entities; i++) entity_manager.entities[i]._inuse = 0;
+
+
+	//UI Layer
+
+	entity_manager.max_ui = max_ui;
+
+	entity_manager.ui_list = malloc(sizeof(Entity) * max_ui);
+
+	for (i = 0; i < max_ui; i++) entity_manager.ui_list[i]._inuse = 0;
+
 
 	entity_manager._initialized = 1;
 
@@ -39,6 +60,10 @@ void entity_manager_free()
 {
 	if (entity_manager.entities != NULL) {
 		free(entity_manager.entities);
+	}
+
+	if (entity_manager.ui_list != NULL) {
+		free(entity_manager.ui_list);
 	}
 
 	if (entity_manager._initialized == 0)
@@ -52,7 +77,7 @@ void entity_manager_free()
 
 //Multiple Entities
 
-Entity* entity_new()
+Entity* entity_new(short is_ingameobject)
 {
 	int i;
 
@@ -61,11 +86,25 @@ Entity* entity_new()
 		slog("Entity Manager does not exist"); return;
 	}
 
-	for (i = 0; i < entity_manager.max_entities; i++)
+	if (is_ingameobject)
 	{
-		if (entity_manager.entities[i]._inuse == 0)
+		for (i = 0; i < entity_manager.max_entities; i++)
 		{
-			return &entity_manager.entities[i];
+			if (entity_manager.entities[i]._inuse == 0)
+			{
+				return &entity_manager.entities[i];
+			}
+		}
+	}
+
+	else
+	{
+		for (i = 0; i < entity_manager.max_ui; i++)
+		{
+			if (entity_manager.ui_list[i]._inuse == 0)
+			{
+				return &entity_manager.ui_list[i];
+			}
 		}
 	}
 
@@ -79,6 +118,20 @@ Entity* entities_clickable(Vector2D mousepos)
 	if (entity_manager._initialized == 0)
 	{
 		slog("Entity Manager does not exist"); return NULL;
+	}
+
+	for (i = 0; i < entity_manager.max_ui; i++)
+	{
+		if (entity_manager.ui_list[i]._inuse != 0)
+		{
+			if (entity_manager.ui_list[i]._hidden == 0)
+			{
+				if (entity_clickable(&entity_manager.ui_list[i], mousepos))
+				{
+					return &entity_manager.ui_list[i];
+				}
+			}
+		}
 	}
 
 	for (i = 0; i < entity_manager.max_entities; i++)
@@ -98,7 +151,7 @@ Entity* entities_clickable(Vector2D mousepos)
 	return NULL;
 }
 
-void entities_draw()
+void all_entities_draw()
 {
 	int i;
 
@@ -114,11 +167,19 @@ void entities_draw()
 			entity_draw(&entity_manager.entities[i]);
 		}
 	}
+
+	for (i = 0; i < entity_manager.max_ui; i++)
+	{
+		if (entity_manager.ui_list[i]._inuse != 0)
+		{
+			entity_draw(&entity_manager.ui_list[i]);
+		}
+	}
 }
 
 //Individual Entity struct code
 
-Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertype, int is_ingameobject, short is_hidden)
+Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertype, short is_ingameobject, short is_hidden)
 {
 	int i;
 
@@ -132,7 +193,7 @@ Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertyp
 
 	//Allocate the new entity and assign its sprite and position
 
-	entity = entity_new();
+	entity = entity_new(is_ingameobject);
 
 	if (entity == NULL)
 	{
@@ -201,11 +262,73 @@ Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertyp
 		entity->colliderbox = NULL;
 	}
 
+
 	entity->draw = NULL;
+
+	entity->font = NULL;
 
 	entity->_inuse = 1;
 
 	return entity;
+}
+
+void entity_add_text_pos(Entity* self, char text[256], Font* font, Vector2D pos)
+{
+	if (!text)
+	{
+		slog("Cannot add NULL text to an entity"); return;
+	}
+
+	if (!font)
+	{
+		slog("Cannot add text with NULL font to an entity"); return;
+	}
+
+	strcpy(self->text, text);
+	self->font = font;
+	vector2d_copy(self->textoffset, pos);
+
+}
+
+void entity_add_text(Entity* self, char text[256], Font* font)
+{
+	if (!self)
+	{
+		slog("Cannot add text to an NULL entity"); return;
+	}
+
+	if (!text)
+	{
+		slog("Cannot add NULL text to an entity"); return;
+	}
+
+	if (!font)
+	{
+		slog("Cannot add text with NULL font to an entity"); return;
+	}
+
+	entity_add_text_pos(self, text, font,
+		vector2d(
+			self->sprite->frame_h * 0.2,
+			(self->sprite->frame_h - font->ptsize) / 2
+		));
+}
+
+void entity_add_clickevent(Entity* self, Game_Event* game_event)
+{
+	if (!self)
+	{
+		slog("Cannot add event to a NULL entity"); return;
+	}
+
+	if (!game_event)
+	{
+		slog("Cannot add NULL event to an entity"); return;
+	}
+
+	self->_clickable = 1;
+
+	self->click_event = game_event;
 }
 
 void entity_draw(Entity* self)
@@ -242,7 +365,6 @@ void entity_draw(Entity* self)
 
 			if (self->collidercircle)
 			{
-				slog("ASD");
 				vector2d_copy(self->collidercircle->viewpos, vector2d(self->collidercircle->worldpos.x - cam->pos.x, self->collidercircle->worldpos.y - cam->pos.y));
 			}
 
@@ -264,12 +386,24 @@ void entity_draw(Entity* self)
 					0
 				);
 
+				if (self->font)
+				{
+					font_render(self->font, self->text,
+						vector2d(
+							self->pos.x - cam->pos.x + self->textoffset.x,
+							self->pos.y - cam->pos.y + self->textoffset.y
+						),
+						gfc_color(1, 1, 1, 0)
+					);
+				}
+
 
 			}
 		}
 
 		else
 		{
+
 			gf2d_sprite_draw
 			(
 				self->sprite,
@@ -281,6 +415,17 @@ void entity_draw(Entity* self)
 				NULL,
 				0
 			);
+
+			if (self->font)
+			{
+				font_render(self->font, self->text,
+					vector2d(
+						self->pos.x + self->textoffset.x,
+						self->pos.y + self->textoffset.y
+					),
+					gfc_color(1, 1, 1, 0)
+				);
+			}
 		}
 	}
 
@@ -292,6 +437,8 @@ int entity_clickable(Entity* self, Vector2D mousepos)
 	{
 		slog("Cannot check if NULL entity is clickable!"); return 0;
 	}
+
+	if (self->_clickable == 0) return 0;
 
 	if (self->colliderbox)
 	{
@@ -312,9 +459,19 @@ int entity_clickable(Entity* self, Vector2D mousepos)
 	return 0;
 }
 
+void entity_onClick(Entity* self)
+{
+	if (!self)
+	{
+		slog("Cannot click on a NULL entity!"); return;
+	}
+
+	if (self->click_event)
+		game_event_trigger(self->click_event);
+}
+
 void entity_free(Entity* self)
 {
-
 	if (!self)
 	{
 		slog("Cannot free NULL entity!"); return;
@@ -328,6 +485,11 @@ void entity_free(Entity* self)
 	if (self->collidercircle != NULL)
 	{
 		circle_free(self->collidercircle);
+	}
+
+	if (self->click_event != NULL)
+	{
+		game_event_free(self->click_event);
 	}
 
 	self->_inuse = 0;

@@ -2,6 +2,98 @@
 
 Game_Data gamedata = { 0 };
 
+int done = 0;
+
+UI_State* test_ui(void* self, Game_Event* gameEvent_prev)
+{
+    UI_State* test_uiState;
+    UI_Arrangement* test_uiArr;
+    Entity* test_uiObj;
+
+    time_t t;
+    srand((unsigned)time(&t));
+
+    /* ui test BEGIN*/
+    
+    //Create new UI State
+    test_uiState = ui_state_new(
+        5,
+        NULL,
+        test_ui,
+        NULL,
+        test_ui
+    );
+
+    test_uiState->prev_game_event = gameEvent_prev;
+
+    //Add first button
+    test_uiObj = entity_init
+    (
+        gf2d_sprite_load_image("resources/images/ui/textbox_brown.png"),
+        vector2d(10, 10),
+        COLL_BOX,
+        0,
+        0
+    );
+
+    entity_add_clickevent(test_uiObj, game_event_new(
+        test_uiObj,
+        NULL,
+        (int)command_game_TEST,
+        0,
+        NULL,
+        test_uiState,
+        test_ui
+    ));
+
+    //Create UI Arr with first button
+    test_uiArr = ui_arr_new(
+        ui_object_new(
+            test_uiObj
+        ),
+        0,
+        10
+    );
+
+    ui_state_pushback(test_uiState, test_uiArr);
+
+    entity_add_text(test_uiArr->top->ent, "TESTING ONE TWO THREE", font_load("resources/fonts/futura light bt.ttf", 16));
+
+    //Add second button
+    test_uiObj = entity_init
+    (
+        gf2d_sprite_load_image("resources/images/ui/textbox_brown.png"),
+        vector2d(0, 0),
+        COLL_BOX,
+        0,
+        0
+    );
+
+    char temp[128];
+    sprintf(temp, "RANDOM NUMBER %d", rand() % 5000);
+
+    entity_add_text(test_uiObj, temp, font_load("resources/fonts/futura light bt.ttf", 16));
+
+    entity_add_clickevent(test_uiObj, game_event_new(
+        test_uiObj,
+        NULL, 
+        (int)command_game_TEST,
+        0, 
+        NULL,
+        test_uiState,
+        test_ui
+    ));
+
+    ui_arr_add(
+        test_uiArr,
+        ui_object_new(
+            test_uiObj
+        )
+    );
+
+    return test_uiState;
+}
+
 Bool clickable()
 {
     return 0;
@@ -14,8 +106,6 @@ void game_loop()
 
 int main(int argc, char* argv[])
 {
-
-    int done = 0;
     const Uint8* keys;
 
     SDL_Event sdlevent;
@@ -33,9 +123,7 @@ int main(int argc, char* argv[])
 
     Vector4D mouseColor = { 255,100,255,200 };
 
-    Entity* test;
-
-    vector2d_copy(gamedata.screensize, vector2d(1280, 720));
+    vector2d_copy(gamedata.screensize, vector2d(1600, 900));
 
     /*program initializtion*/
     init_logger("gf2d.log");
@@ -53,29 +141,25 @@ int main(int argc, char* argv[])
     SDL_ShowCursor(SDL_DISABLE);
 
     /*demo setup*/
-    background = gf2d_sprite_load_image("resources/images/background/bg_base.png");
+    background = gf2d_sprite_load_image("resources/images/background/bg_1600_900.png");
 
     mouse_idle = gf2d_sprite_load_all("resources/images/ui/cursor.png", 32, 32, 1);
     mouse_click = gf2d_sprite_load_all("resources/images/ui/cursor_click.png", 32, 32, 1);
     mouse_drag = gf2d_sprite_load_all("resources/images/ui/cursor_drag.png", 32, 32, 1);
 
-    gamedata.camera = camera_init(vector2d(0, 0), gamedata.screensize, vector2d(2, 2));
+    //Initialize Camera
+    camera_init(vector2d(0, 0), gamedata.screensize, vector2d(2, 2));
 
-    entity_manager_init(100);
+    //Initialize Entity Manager
+    entity_manager_init(100, 100);
+
+    //Initialize Font System
+    font_init(50);
 
     parallax0 = parallax_init(gf2d_sprite_load_image("resources/images/background/bg_overlay.png"), vector2d(0, 0), 0.5);
     parallax1 = parallax_init(gf2d_sprite_load_image("resources/images/background/bg_overlay_02.png"), vector2d(0, 0), 0.2);
 
-    /* entity test BEGIN*/
-    test = entity_init
-    (
-        gf2d_sprite_load_image("resources/images/bibbutest.png"),
-        vector2d(0,0),
-        COLL_CIRCLE,
-        0,
-        0
-    );
-    /* entity test END*/
+    gamedata.uiState_curr = test_ui(NULL, NULL);
 
     /*main game loop*/
     while (!done)
@@ -94,28 +178,19 @@ int main(int argc, char* argv[])
 
         game_loop();
 
-        entities_draw();//if (test != NULL) { entity_draw(test); }
+        all_entities_draw();//if (test != NULL) { entity_draw(test); }
 
         mouse_update(mouse_idle, mouse_click, mouse_drag);
         
-        /*Drawing entity test BEGIN*/
         int mx, my;
         SDL_GetMouseState(&mx, &my);
-        //if (entity_clickable(test, vector2d(mx, my))) { }
-        /*Drawing entity test END*/
 
         gf2d_grahics_next_frame();// render current draw frame and skip to the next frame
 
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
 
-        while (SDL_PollEvent(&sdlevent))
-        {
-            if (sdlevent.type == SDL_QUIT)
-            {
-                done = 1;
-            }
-
-        }
+        //Poll SDL Events
+        sdl_event();
         
         //slog("Rendering at %f FPS", gf2d_graphics_get_frames_per_second());
     }
@@ -127,9 +202,62 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-Bool mouse_clickable()
+void game_recieve_event(Game_Event* gameEvent)
 {
 
+    if (!gameEvent)
+    {
+        slog("Cannot recieve NULL Game Event"); return;
+    }
+
+    if (gameEvent->event_command == (int)command_game_TEST)
+    {
+        slog("GAME EVENT COMMAND == command_game_TEST");
+    }
+}
+
+void game_set_ui_state(UI_State* ui_state)
+{
+    if (!ui_state)
+    {
+        slog("Cannot set game's current UI_State to NULL state"); return;
+    }
+
+    gamedata.uiState_curr = ui_state;
+}
+
+void sdl_event()
+{
+    SDL_Event sdl_event;
+    while (SDL_PollEvent(&sdl_event)) {
+
+        switch (sdl_event.type) {
+
+        case SDL_QUIT:
+            done = 1;
+            break;
+
+        case SDL_MOUSEBUTTONDOWN:
+
+            if (sdl_event.button.button == SDL_BUTTON_LEFT)
+            {
+                if (gamedata.hovering_ent)
+                {
+                    entity_onClick(gamedata.hovering_ent);
+                }
+            }
+
+            break;
+
+        case SDL_KEYDOWN:
+
+            if (sdl_event.key.keysym.sym == SDLK_BACKSPACE)
+            {
+                gamedata.uiState_curr = previous_ui_state(gamedata.uiState_curr);
+            }
+
+        }
+    }
 }
 
 void mouse_update(Sprite* idle, Sprite* hover, Sprite* drag)
@@ -145,13 +273,13 @@ void mouse_update(Sprite* idle, Sprite* hover, Sprite* drag)
 
     //Move camera
 
-    if (mx < gamedata.screensize.x * 0.04) { camx = -1; }
+    if (mx < gamedata.screensize.x * 0.01) { camx = -1; }
 
-    if (mx > gamedata.screensize.x - (gamedata.screensize.x * 0.04)) { camx = 1;  }
+    if (mx > gamedata.screensize.x - (gamedata.screensize.x * 0.01)) { camx = 1;  }
 
-    if (my < gamedata.screensize.y * 0.07) { camy = -1; }
+    if (my < gamedata.screensize.y * 0.02) { camy = -1; }
 
-    if (my > gamedata.screensize.y - (gamedata.screensize.y * 0.07)) { camy = 1;  }
+    if (my > gamedata.screensize.y - (gamedata.screensize.y * 0.02)) { camy = 1;  }
 
     camera_move(vector2d(camx, camy));
 
