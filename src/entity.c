@@ -138,6 +138,7 @@ Entity* entities_clickable(Vector2D mousepos)
 	{
 		if (entity_manager.entities[i]._inuse != 0)
 		{
+
 			if (entity_manager.entities[i]._hidden == 0)
 			{
 				if (entity_clickable(&entity_manager.entities[i], mousepos))
@@ -242,6 +243,7 @@ Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertyp
 
 	else if (collidertype == COLL_CIRCLE)
 	{
+
 		//Set the collider to be a circle with a radius equal to the length or width of the sprite (whichever is larger), and a position where the center of the sprite would be.
 
 		entity->collidercircle = circle_new();
@@ -442,6 +444,7 @@ int entity_clickable(Entity* self, Vector2D mousepos)
 
 	if (self->colliderbox)
 	{
+
 		if (box_clickable(self->colliderbox, mousepos))
 		{
 			return 1;
@@ -450,6 +453,7 @@ int entity_clickable(Entity* self, Vector2D mousepos)
 
 	else if (self->collidercircle)
 	{
+
 		if (circle_clickable(self->collidercircle, mousepos))
 		{
 			return 1;

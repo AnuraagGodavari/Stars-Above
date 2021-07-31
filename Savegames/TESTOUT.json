@@ -1,0 +1,1 @@
+{"Map":[{"name":"System1","type":"Star System","worldpos":["100","100"],"neighbors":["System2"]},{"name":"System2","type":"Star System","worldpos":["200","200"],"neighbors":["System1","System3"]},{"name":"System3","type":"Star System","worldpos":["300","300"],"neighbors":["System2"]}]}

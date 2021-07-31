@@ -7,6 +7,7 @@
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
 #include "simple_logger.h"
+#include "simple_json.h"
 #include "gfc_types.h"
 
 #include "gameresources.h"
@@ -16,6 +17,10 @@
 
 #include "entity.h"
 #include "ui_base.h"
+
+#include "starsabove_system.h"
+
+#include "starsabove_map.h"
 
 typedef enum game_commands
 {

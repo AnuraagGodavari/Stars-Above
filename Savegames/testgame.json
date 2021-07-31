@@ -1,22 +1,22 @@
 {
 	
 	"Map":
-	{
+	[
 		
-		"System1":
 		{
+			"name": "System1"
 			"type": "Star System",
-			"coordinates": [100, 100],
+			"worldpos": [100, 100],
 			"neighbors":
 			[
 				"System2"
 			]
 		},
 		
-		"System2":
 		{
+			"name": "System2"
 			"type": "Star System",
-			"coordinates": [200, 200],
+			"worldpos": [200, 200],
 			"neighbors":
 			[
 				"System1",
@@ -24,10 +24,10 @@
 			]
 		},
 		
-		"System3":
 		{
+			"name": "System3"
 			"type": "Star System",
-			"coordinates": [300, 300],
+			"worldpos": [300, 300],
 			"neighbors":
 			[
 				"System2"
@@ -35,6 +35,6 @@
 		}
 		
 		
-	}
+	]
 	
 }
