@@ -196,6 +196,8 @@ int main(int argc, char* argv[])
 
         all_entities_draw();//if (test != NULL) { entity_draw(test); }
 
+        map_drawPaths();
+
         mouse_update(mouse_idle, mouse_click, mouse_drag);
         
         int mx, my;
@@ -290,13 +292,13 @@ void mouse_update(Sprite* idle, Sprite* hover, Sprite* drag)
 
     //Move camera
 
-    if (mx < gamedata.screensize.x * 0.01) { camx = -1; }
+    if (mx < gamedata.screensize.x * 0.015) { camx = -1; }
 
-    if (mx > gamedata.screensize.x - (gamedata.screensize.x * 0.01)) { camx = 1;  }
+    if (mx > gamedata.screensize.x - (gamedata.screensize.x * 0.015)) { camx = 1;  }
 
-    if (my < gamedata.screensize.y * 0.02) { camy = -1; }
+    if (my < gamedata.screensize.y * 0.03) { camy = -1; }
 
-    if (my > gamedata.screensize.y - (gamedata.screensize.y * 0.02)) { camy = 1;  }
+    if (my > gamedata.screensize.y - (gamedata.screensize.y * 0.03)) { camy = 1;  }
 
     camera_move(vector2d(camx, camy));
 

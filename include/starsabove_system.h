@@ -13,9 +13,8 @@
 
 #include "entity.h"
 
-typedef struct System
+typedef struct System_s
 {
-	short _inuse;
 
 	char name[128];
 	int id;
@@ -24,7 +23,7 @@ typedef struct System
 	Entity* ent;
 
 	Uint32 num_neighbor_systems;
-	struct System** neighbor_systems;
+	struct System_s** neighbor_systems;
 
 } System;
 

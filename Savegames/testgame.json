@@ -4,7 +4,7 @@
 	[
 		
 		{
-			"name": "System1"
+			"name": "System1",
 			"type": "Star System",
 			"worldpos": [100, 100],
 			"neighbors":
@@ -14,7 +14,7 @@
 		},
 		
 		{
-			"name": "System2"
+			"name": "System2",
 			"type": "Star System",
 			"worldpos": [200, 200],
 			"neighbors":
@@ -25,7 +25,7 @@
 		},
 		
 		{
-			"name": "System3"
+			"name": "System3",
 			"type": "Star System",
 			"worldpos": [300, 300],
 			"neighbors":

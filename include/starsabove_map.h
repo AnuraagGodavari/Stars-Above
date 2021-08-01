@@ -22,6 +22,10 @@ SJson* map_toJson();
 
 void map_init(Uint32 num_systems);
 
+void map_drawPaths();
+
 void map_free();
+
+Map* get_map();
 
 #endif
