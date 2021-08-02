@@ -28,12 +28,14 @@ Map* map_fromJson(SJson* map_json)
 		slog("Cannot load map from non-array json"); return;
 	}
 
+	//Initialize the map with the number of systems
 	map_init(sj_array_get_count(map_json));
 
 	for (i = 0; i < game_map.num_systems; i++)
 	{
 		curr_system = system_fromJson(&game_map.systems[i], sj_array_get_nth(map_json, i));
 
+		//TEMPORARY: Remove when adding GameEvents
 		game_map.systems[i].ent->_clickable = 1;
 
 	}
@@ -75,7 +77,7 @@ void map_drawPaths()
 
 		for (j = 0; j < game_map.systems[i].num_neighbor_systems; j++)
 		{
-
+			//NOTE: Maybe add and compare IDs? 'a' value in vector4d must be half of what we actually want because of twice-over redraws
 			gf2d_draw_line
 			(
 				game_map.systems[i].ent->collidercircle->viewpos,

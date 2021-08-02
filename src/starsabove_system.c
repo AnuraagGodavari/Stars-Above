@@ -18,6 +18,7 @@ System* system_fromJson(System* self, SJson* self_json)
 	pos_json = sj_object_get_value(self_json, "worldpos");
 	pos = vector2d(0, 0);
 
+	//Convert the list elements in the position JSON array to coordinates
 	sj_get_float_value(sj_array_get_nth(pos_json, 0), &pos.x);
 	sj_get_float_value(sj_array_get_nth(pos_json, 1), &pos.y);
 
@@ -52,16 +53,18 @@ void system_add_all_neighbors(System* self, SJson* self_json)
 
 	game_map = get_map();
 
+	//Iterate through the assigned neighbor systems
 	for (i = 0; i < sj_array_get_count(neighbors_json); i++)
 	{
+		//Get the neighbor's name
 		strcpy(curr_neighbor, sj_get_string_value(sj_array_get_nth(neighbors_json, i)));
 
+		//Find the neighbor in the game map's list of systems
 		for (j = 0; j < game_map->num_systems; j++)
 		{
 
 			if (strcmp(curr_neighbor, game_map->systems[j].name) == 0)
 			{
-
 				system_add_neighbor(self, &game_map->systems[j]);
 
 				continue;
@@ -97,6 +100,7 @@ System* system_init(System* self, char* name, Vector2D worldpos, Uint32 num_neig
 		0
 	);
 
+	//Set all the neighboring systems' pointers to NULL for the time being
 	for (i = 0; i < num_neighbor_systems; i++)
 	{
 		self->neighbor_systems[i] = NULL;
@@ -131,8 +135,10 @@ void system_add_neighbor(System* self, System* neighbor)
 	}
 }
 
-void system_free(System* system)
+void system_free(System* self)
 {
+	entity_free(self->ent);
 
+	memset(&self, 0, sizeof(System));
 }
 

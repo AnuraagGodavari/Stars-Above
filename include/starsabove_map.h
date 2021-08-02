@@ -15,17 +15,35 @@ typedef struct
 
 } Map;
 
+/*
+* @brief Load the game's map from a JSON object
+*/
 Map* map_fromJson(SJson* map_json);
 
+/*
+* @brief Save the game's map to a JSON object
+*/
 SJson* map_toJson();
 
 
+/*
+* @brief Initialize the game's map
+*/
 void map_init(Uint32 num_systems);
 
+/*
+* @brief Render the lines between neighboring locations
+*/
 void map_drawPaths();
 
+/*
+* @brief Free the game's map
+*/
 void map_free();
 
+/*
+* @brief Get a pointer to the game's map
+*/
 Map* get_map();
 
 #endif
