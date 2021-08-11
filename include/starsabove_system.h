@@ -10,8 +10,16 @@
 #include "gfc_types.h"
 
 #include "gameresources.h"
-
 #include "entity.h"
+
+#include "starsabove_planet.h"
+
+typedef enum
+{
+
+	command_system_seePlanets
+
+} system_commands;
 
 typedef struct System_s
 {
@@ -24,6 +32,9 @@ typedef struct System_s
 
 	Uint32 num_neighbor_systems;
 	struct System_s** neighbor_systems;
+
+	Uint32 num_planets;
+	Planet** planets;
 
 } System;
 
@@ -47,12 +58,22 @@ SJson* system_toJson(System* self);
 * @brief Initialize a system to an address within the game's map
 * @param self NULL address where we want this system to be in memory
 */
-System* system_init(System* self, char* name, Vector2D worldpos, Uint32 num_neighbor_systems);
+void system_init(System* self, char* name, Vector2D worldpos, Uint32 num_neighbor_systems, Uint32 num_planets);
+
+/*
+* @brief Recieve and process a game event for a system
+*/
+void system_reciever(Game_Event* gameEvent);
 
 /*
 * @brief Add a neighboring system to a system
 */
 void system_add_neighbor(System* self, System* neighbor);
+
+/*
+* @brief Add a planet to a system
+*/
+void system_add_planet(System* self, Planet* planet);
 
 /*
 * @brief Free a star system

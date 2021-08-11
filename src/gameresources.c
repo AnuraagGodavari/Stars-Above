@@ -97,7 +97,8 @@ void game_event_trigger(Game_Event* self)
 		game_set_ui_state(new_uistate);
 	}
 
-	ui_state_free(self->uiState);
+	if (self->uiState)
+		ui_state_free(self->uiState);
 	
 }
 

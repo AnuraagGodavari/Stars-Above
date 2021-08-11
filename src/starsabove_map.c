@@ -33,10 +33,7 @@ Map* map_fromJson(SJson* map_json)
 
 	for (i = 0; i < game_map.num_systems; i++)
 	{
-		curr_system = system_fromJson(&game_map.systems[i], sj_array_get_nth(map_json, i));
-
-		//TEMPORARY: Remove when adding GameEvents
-		game_map.systems[i].ent->_clickable = 1;
+		system_fromJson(&game_map.systems[i], sj_array_get_nth(map_json, i));
 
 	}
 

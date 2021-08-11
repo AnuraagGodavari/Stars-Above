@@ -19,8 +19,6 @@ void game_load(char* savename)
     game_json = sj_load(savepath);
 
     map_fromJson(sj_object_get_value(game_json, "Map"));
-
-    sj_save(game_json, "Savegames/TESTOUT.json");
 }
 
 UI_State* test_ui(void* self, Game_Event* gameEvent_prev)

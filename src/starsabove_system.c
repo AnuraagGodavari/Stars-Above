@@ -7,12 +7,21 @@
 
 System* system_fromJson(System* self, SJson* self_json)
 {
+	int i;
+
 	SJson* pos_json;
 	Vector2D pos;
 
+	SJson* planets_array;
+
+	if (!self)
+	{
+		slog("Cannot load Star System to NULL address"); return NULL;
+	}
+
 	if (!self_json)
 	{
-		slog("Cannot load Star System from NULL json"); return;
+		slog("Cannot load Star System from NULL json"); return NULL;
 	}
 
 	pos_json = sj_object_get_value(self_json, "worldpos");
@@ -27,9 +36,24 @@ System* system_fromJson(System* self, SJson* self_json)
 		self,
 		sj_get_string_value(sj_object_get_value(self_json, "name")),
 		pos,
-		(Uint32) sj_array_get_count(sj_object_get_value(self_json, "neighbors"))
+		(Uint32) sj_array_get_count(sj_object_get_value(self_json, "neighbors")), 
+		(Uint32) sj_array_get_count(sj_object_get_value(self_json, "planets"))
 	);
 
+	if (!self)
+	{
+		slog("Did not load planets"); return NULL;
+	}
+
+	planets_array = sj_object_get_value(self_json, "planets");
+
+	for (i = 0; i < self->num_planets; i++)
+	{
+		if (self->planets[i] == NULL)
+			self->planets[i] = planet_fromJson(sj_array_get_nth(planets_array, i), self);
+	}
+
+	return self;
 }
 
 void system_add_all_neighbors(System* self, SJson* self_json)
@@ -76,13 +100,13 @@ void system_add_all_neighbors(System* self, SJson* self_json)
 
 //System Code
 
-System* system_init(System* self, char* name, Vector2D worldpos, Uint32 num_neighbor_systems)
+void system_init(System* self, char* name, Vector2D worldpos, Uint32 num_neighbor_systems, Uint32 num_planets)
 {
 	int i;
 
 	if (!self)
 	{
-		slog("Cannot init NULL system");
+		slog("Cannot init NULL system"); return;
 	}
 
 	strcpy(self->name, name);
@@ -90,6 +114,10 @@ System* system_init(System* self, char* name, Vector2D worldpos, Uint32 num_neig
 	self->num_neighbor_systems = num_neighbor_systems;
 
 	self->neighbor_systems = malloc(sizeof(System*) * num_neighbor_systems);
+
+	self->num_planets = num_planets;
+
+	self->planets = malloc(sizeof(Planet*) * num_planets);
 
 	self->ent = entity_init
 	(
@@ -106,6 +134,32 @@ System* system_init(System* self, char* name, Vector2D worldpos, Uint32 num_neig
 		self->neighbor_systems[i] = NULL;
 	}
 
+	//Set all the planet pointers to NULL for the time being
+	for (i = 0; i < num_neighbor_systems; i++)
+	{
+		self->planets[i] = NULL;
+	}
+
+	entity_add_clickevent
+	(
+		self->ent,
+		game_event_new
+		(
+			(void*)self,
+			(void*)self,
+			(int)command_system_seePlanets,
+			-1,
+			system_reciever,
+			NULL,
+			NULL
+		)
+	);
+
+}
+
+void system_reciever(Game_Event* gameEvent)
+{
+	slog("SYSTEM RECIEVER");
 }
 
 void system_add_neighbor(System* self, System* neighbor)
@@ -129,6 +183,33 @@ void system_add_neighbor(System* self, System* neighbor)
 		if (self->neighbor_systems[i] == NULL)
 		{
 			self->neighbor_systems[i] = neighbor;
+
+			return;
+		}
+	}
+}
+
+void system_add_planet(System* self, Planet* planet)
+{
+
+	int i;
+
+	if (!self)
+	{
+		slog("Cannot add neighbor to NULL system"); return;
+	}
+
+	if (!planet)
+	{
+		slog("Cannot add NULL neighbor to system"); return;
+	}
+
+	for (i = 0; i < self->num_planets; i++)
+	{
+
+		if (self->planets[i] == NULL)
+		{
+			self->planets[i] = planet;
 
 			return;
 		}

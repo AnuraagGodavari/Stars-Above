@@ -10,6 +10,20 @@
 			"neighbors":
 			[
 				"System2"
+			],
+			"planets":
+			[
+				{
+					"name": "System1 I"
+				},
+				
+				{
+					"name": "System1 II"
+				},
+				
+				{
+					"name": "System1 III"
+				}
 			]
 		},
 		
@@ -21,6 +35,20 @@
 			[
 				"System1",
 				"System3"
+			],
+			"planets":
+			[
+				{
+					"name": "System2 I"
+				},
+				
+				{
+					"name": "System2 II"
+				},
+				
+				{
+					"name": "System2 III"
+				}
 			]
 		},
 		
@@ -31,6 +59,20 @@
 			"neighbors":
 			[
 				"System2"
+			],
+			"planets":
+			[
+				{
+					"name": "System3 I"
+				},
+				
+				{
+					"name": "System3 II"
+				},
+				
+				{
+					"name": "System3 III"
+				}
 			]
 		}
 		
