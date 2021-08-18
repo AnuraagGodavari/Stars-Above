@@ -30,6 +30,8 @@ typedef enum game_commands
 typedef struct 
 {
 
+	char game_name[128];
+
 	Vector2D screensize;
 
 	Entity* hovering_ent;
@@ -43,6 +45,8 @@ typedef struct
 void game_prepare();
 
 void game_load(char* savefile);
+
+void game_save(char* savename);
 
 void game_loop();
 

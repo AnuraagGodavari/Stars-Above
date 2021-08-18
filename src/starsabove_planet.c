@@ -28,7 +28,18 @@ Planet* planet_fromJson(SJson* self_json, System* parent)
 
 SJson* planet_toJson(Planet* self)
 {
+	SJson* planet_json;
 
+	if (!self)
+	{
+		slog("Cannot save NULL planet to Json"); return NULL;
+	}
+
+	planet_json = sj_object_new();
+
+	sj_object_insert(planet_json, "name", sj_new_str(self->name));
+
+	return planet_json;
 }
 
 

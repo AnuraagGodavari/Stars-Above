@@ -21,6 +21,25 @@ void game_load(char* savename)
     map_fromJson(sj_object_get_value(game_json, "Map"));
 }
 
+void game_save(char* savename)
+{
+    char savepath[128];
+    SJson* game_json;
+
+    if (!savename)
+    {
+        slog("Cannot load game from NULL savefile!"); return;
+    }
+
+    sprintf(savepath, "Savegames/%s.json", savename);
+
+    game_json = sj_object_new();
+
+    sj_object_insert(game_json, "Map", map_toJson());
+
+    sj_save(game_json, savepath);
+}
+
 UI_State* test_ui(void* self, Game_Event* gameEvent_prev)
 {
     UI_State* test_uiState;
@@ -172,6 +191,8 @@ int main(int argc, char* argv[])
     parallax1 = parallax_init(gf2d_sprite_load_image("assets/images/background/bg_overlay_02.png"), vector2d(0, 0), 0.2);
 
     game_load("testgame");
+
+    game_save("TESTOUT");
 
    // gamedata.uiState_curr = test_ui(NULL, NULL);
 

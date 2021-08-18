@@ -11,6 +11,7 @@ Map* map_fromJson(SJson* map_json)
 {
 	int i;
 
+	SJson* systems_arr;
 	System* curr_system;
 
 	if (game_map.systems)
@@ -23,17 +24,19 @@ Map* map_fromJson(SJson* map_json)
 		slog("Cannot load map from NULL json"); return;
 	}
 
-	if (!sj_is_array(map_json))
+	systems_arr = sj_object_get_value(map_json, "Systems");
+
+	if (!sj_is_array(systems_arr))
 	{
-		slog("Cannot load map from non-array json"); return;
+		slog("Cannot load systems from non-array json"); return;
 	}
 
 	//Initialize the map with the number of systems
-	map_init(sj_array_get_count(map_json));
+	map_init(sj_array_get_count(systems_arr));
 
 	for (i = 0; i < game_map.num_systems; i++)
 	{
-		system_fromJson(&game_map.systems[i], sj_array_get_nth(map_json, i));
+		system_fromJson(&game_map.systems[i], sj_array_get_nth(systems_arr, i));
 
 	}
 
@@ -41,10 +44,35 @@ Map* map_fromJson(SJson* map_json)
 	{
 		curr_system = &game_map.systems[i];
 
-		system_add_all_neighbors(curr_system, sj_array_get_nth(map_json, i));
+		system_add_all_neighbors(curr_system, sj_array_get_nth(systems_arr, i));
 
 	}
 
+}
+
+SJson* map_toJson()
+{
+	int i;
+
+	SJson* map_json;
+	SJson* systems_json;
+
+	if (!game_map.systems)
+	{
+		slog("Cannot save NULL map to JSON"); return NULL;
+	}
+
+	map_json = sj_object_new();
+	systems_json = sj_array_new();
+
+	for (i = 0; i < game_map.num_systems; i++)
+	{
+		sj_array_append(systems_json, system_toJson(&game_map.systems[i]));
+	}
+
+	sj_object_insert(map_json, "Systems", systems_json);
+
+	return map_json;
 }
 
 void map_init(Uint32 num_systems)

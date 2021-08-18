@@ -47,9 +47,10 @@ System* system_fromJson(System* self, SJson* self_json)
 
 	planets_array = sj_object_get_value(self_json, "planets");
 
+
+
 	for (i = 0; i < self->num_planets; i++)
 	{
-		if (self->planets[i] == NULL)
 			self->planets[i] = planet_fromJson(sj_array_get_nth(planets_array, i), self);
 	}
 
@@ -97,6 +98,61 @@ void system_add_all_neighbors(System* self, SJson* self_json)
 	}
 }
 
+SJson* system_toJson(System* self)
+{
+	int i;
+
+	SJson* system_json;
+
+	SJson* worldpos_json;
+
+	SJson* planets_json;
+	SJson* neighbors_json;
+
+	if (!self)
+	{
+		slog("Cannot save NULL system to Json"); return NULL;
+	}
+
+	system_json = sj_object_new();
+
+	worldpos_json = sj_array_new();
+
+	planets_json = sj_array_new();
+	neighbors_json = sj_array_new();
+
+	//Insert basic information
+
+	sj_object_insert(system_json, "name", sj_new_str(self->name));
+	
+	sj_array_append(worldpos_json, sj_new_float(self->worldpos.x));
+	sj_array_append(worldpos_json, sj_new_float(self->worldpos.y));
+	sj_object_insert(system_json, "worldpos", worldpos_json);
+
+
+	//Insert planets
+
+	for (i = 0; i < self->num_planets; i++)
+	{
+		sj_array_append(planets_json, planet_toJson(self->planets[i]));
+	}
+
+	sj_object_insert(system_json, "planets", planets_json);
+
+
+	//Insert neighbor names
+
+	for (i = 0; i < self->num_neighbor_systems; i++)
+	{
+
+		sj_array_append(neighbors_json, sj_new_str(self->neighbor_systems[i]->name));
+	}
+
+	sj_object_insert(system_json, "neighbors", neighbors_json);
+
+	return system_json;
+}
+
 
 //System Code
 
@@ -118,6 +174,8 @@ void system_init(System* self, char* name, Vector2D worldpos, Uint32 num_neighbo
 	self->num_planets = num_planets;
 
 	self->planets = malloc(sizeof(Planet*) * num_planets);
+
+	vector2d_copy(self->worldpos, worldpos);
 
 	self->ent = entity_init
 	(
