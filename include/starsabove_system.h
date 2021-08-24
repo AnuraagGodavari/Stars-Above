@@ -12,12 +12,14 @@
 #include "gameresources.h"
 #include "entity.h"
 
+#include "ui_base.h"
+
 #include "starsabove_planet.h"
 
 typedef enum
 {
 
-	command_system_seePlanets
+	command_system_systemView
 
 } system_commands;
 
@@ -28,7 +30,10 @@ typedef struct System_s
 	int id;
 
 	Vector2D worldpos;
-	Entity* ent;
+
+	Entity* ent_worldview;
+	
+	Sprite* sprite_systemview;
 
 	Uint32 num_neighbor_systems;
 	struct System_s** neighbor_systems;
@@ -61,11 +66,6 @@ SJson* system_toJson(System* self);
 void system_init(System* self, char* name, Vector2D worldpos, Uint32 num_neighbor_systems, Uint32 num_planets);
 
 /*
-* @brief Recieve and process a game event for a system
-*/
-void system_reciever(Game_Event* gameEvent);
-
-/*
 * @brief Add a neighboring system to a system
 */
 void system_add_neighbor(System* self, System* neighbor);
@@ -79,5 +79,16 @@ void system_add_planet(System* self, Planet* planet);
 * @brief Free a star system
 */
 void system_free(System* system);
+
+
+/*
+* @brief Recieve and process a game event for a system
+*/
+void system_reciever(void* self_void, Game_Event* gameEvent);
+
+/*
+* @brief Generate a system's UI State
+*/
+UI_State* system_uiState(void* self, Game_Event* gameEvent_prev);
 
 #endif

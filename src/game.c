@@ -4,6 +4,11 @@ Game_Data gamedata = { 0 };
 
 int done = 0;
 
+Game_Data* get_gamedata()
+{
+    return &gamedata;
+}
+
 void game_load(char* savename)
 {
     char savepath[128];
@@ -79,7 +84,8 @@ UI_State* test_ui(void* self, Game_Event* gameEvent_prev)
         0,
         NULL,
         test_uiState,
-        test_ui
+        test_ui,
+        0
     ));
 
     //Create UI Arr with first button
@@ -117,7 +123,8 @@ UI_State* test_ui(void* self, Game_Event* gameEvent_prev)
         0, 
         NULL,
         test_uiState,
-        test_ui
+        test_ui,
+        0
     ));
 
     ui_arr_add(
@@ -194,7 +201,7 @@ int main(int argc, char* argv[])
 
     game_save("TESTOUT");
 
-   // gamedata.uiState_curr = test_ui(NULL, NULL);
+    //gamedata.uiState_curr = test_ui(NULL, NULL);
 
     /*main game loop*/
     while (!done)
@@ -259,6 +266,9 @@ void game_set_ui_state(UI_State* ui_state)
     {
         slog("Cannot set game's current UI_State to NULL state"); return;
     }
+
+    if (gamedata.uiState_curr)
+        ui_state_free(gamedata.uiState_curr);
 
     gamedata.uiState_curr = ui_state;
 }

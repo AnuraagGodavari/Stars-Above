@@ -11,6 +11,7 @@
 
 #include "gameresources.h"
 #include "entity.h"
+#include "ui_base.h"
 
 typedef struct System;
 
@@ -21,7 +22,7 @@ typedef struct
 
 	struct System* parent;
 
-	Entity* ent_systemview;
+	Sprite* sprite_systemview;
 
 } Planet;
 
@@ -30,8 +31,11 @@ Planet* planet_fromJson(SJson* self_json, struct System* parent);
 SJson* planet_toJson(Planet* self);
 
 
-Planet* planet_init(char* name, struct System* parent);
+Planet* planet_init(char* name, struct System* parent, Sprite* sprite_systemview);
 
 void planet_free(Planet* self);
+
+
+UI_Object* planet_uiobj(Planet* self);
 
 #endif

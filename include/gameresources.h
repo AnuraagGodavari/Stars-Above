@@ -30,8 +30,9 @@ typedef struct
 	int qty;
 
 	short _gamewide;
+	short _trigger_when_prev; //Trigger this game event if it is the previous game event to a current UI State that is going backwards.
 
-	struct UI_State* uiState;
+	struct UI_State* uiState; //The UI State containing the button this event is attached to (if any)
 
 	uiState_generator uiState_next;
 
@@ -46,7 +47,7 @@ typedef struct
 
 } Game_Event;
 
-Game_Event* game_event_new(void* actor, void* target, int command, int qty, reciever_func* reciever, struct UI_State* uiState, uiState_generator uiState_next);
+Game_Event* game_event_new(void* actor, void* target, int command, int qty, reciever_func* reciever, struct UI_State* uiState, uiState_generator uiState_next, short _trigger_prev);
 
 void game_event_trigger(Game_Event* game_event);
 

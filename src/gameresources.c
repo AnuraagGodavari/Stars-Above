@@ -4,7 +4,7 @@
 
 #include "game.h"
 
-Game_Event* game_event_new(void* actor, void* target, int command, int qty, reciever_func* reciever, UI_State* uiState, uiState_generator uiState_next)
+Game_Event* game_event_new(void* actor, void* target, int command, int qty, reciever_func* reciever, UI_State* uiState, uiState_generator uiState_next, short _trigger_prev)
 {
 	Game_Event* self;
 
@@ -32,6 +32,11 @@ Game_Event* game_event_new(void* actor, void* target, int command, int qty, reci
 
 	else { self->_gamewide = 1; }
 
+	if (_trigger_prev == 1)
+		self->_trigger_when_prev = 1;
+
+	else self->_trigger_when_prev = 0;
+
 	self->sub_event = NULL;
 	self->prev_event = NULL;
 
@@ -56,7 +61,8 @@ Game_Event* game_event_copy(Game_Event* self)
 		self->qty,
 		self->reciever,
 		self->uiState,
-		self->uiState_next
+		self->uiState_next,
+		self->_trigger_when_prev
 	);
 
 	if (self->sub_event)
@@ -92,12 +98,25 @@ void game_event_trigger(Game_Event* self)
 	{
 		new_uistate = self->uiState_next(self->target, self);
 
-		new_uistate->prev_game_event = game_event_copy(self);
+		if (new_uistate == NULL)
+		{
+			slog("New UI State could not be generated");
+		}
 
-		game_set_ui_state(new_uistate);
+		else
+		{
+			new_uistate->prev_game_event = game_event_copy(self);
+
+			game_set_ui_state(new_uistate);
+		}
 	}
 
-	if (self->uiState)
+	if (self->sub_event)
+	{
+		game_event_trigger(self->sub_event);
+	}
+
+	if (self->uiState != NULL)
 		ui_state_free(self->uiState);
 	
 }

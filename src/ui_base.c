@@ -66,9 +66,9 @@ void ui_object_add(UI_Object* self, UI_Object* new_ui, int x_spacing, int y_spac
 
 void ui_object_free(UI_Object* self)
 {
-	if (self->ent) entity_free(self->ent);
-
 	if (self->next) ui_object_free(self->next);
+
+	if (self->ent) entity_free(self->ent);
 
 	memset(&self, 0, sizeof(UI_Object));
 }
@@ -224,7 +224,17 @@ UI_State* previous_ui_state(UI_State* self)
 		slog("Cannot go backwards from NULL UI State"); return NULL;
 	}
 
-	if (!self->prev_generator) { return self; }
+	if (!self->prev_generator) 
+	{ 
+		ui_state_free(self);
+
+		if (self->prev_game_event->_trigger_when_prev == 1)
+		{
+			game_event_trigger(self->prev_game_event);
+		}
+
+		return NULL; 
+	}
 
 	//If self has no previous game_event
 	if (!self->prev_game_event) 
@@ -269,6 +279,7 @@ void ui_state_free(UI_State* self)
 
 	for (i = 0; i < self->num_arrs; i++)
 	{
+
 		if (self->arrs[i] != NULL)
 		{
 			ui_arr_free(self->arrs[i]);

@@ -198,7 +198,7 @@ Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertyp
 
 	if (entity == NULL)
 	{
-		slog("Entity could not be initialized"); return;
+		slog("Entity could not be initialized"); return NULL;
 	}
 
 	entity->sprite = sprite;
@@ -218,6 +218,11 @@ Entity* entity_init(Sprite* sprite, Vector2D pos, enum_collider_type collidertyp
 	if (is_hidden == 0) { entity->_hidden = 0; }
 
 	else { entity->_hidden = 1; }
+
+
+	entity->_clickable = 0;
+
+	entity->click_event = NULL;
 
 
 	//Set the entity collider type
@@ -480,24 +485,23 @@ void entity_free(Entity* self)
 	{
 		slog("Cannot free NULL entity!"); return;
 	}
-
+	
 	if (self->colliderbox != NULL)
 	{
 		box_free(self->colliderbox);
 	}
-
+	
 	if (self->collidercircle != NULL)
 	{
 		circle_free(self->collidercircle);
 	}
-
+	
 	if (self->click_event != NULL)
 	{
 		game_event_free(self->click_event);
 	}
-
+	
 	self->_inuse = 0;
-
+	
 	memset(&self, 0, sizeof(Entity));
-
 }

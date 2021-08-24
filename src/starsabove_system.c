@@ -1,5 +1,8 @@
 #include "simple_logger.h"
 
+#include "game.h"
+#include "ui_base.h"
+
 #include "starsabove_map.h"
 #include "starsabove_system.h"
 
@@ -154,7 +157,31 @@ SJson* system_toJson(System* self)
 }
 
 
-//System Code
+//Setup Code
+
+void system_clickevent(System* self)
+{
+	if (!self)
+	{
+		slog("Cannot init NULL system"); return;
+	}
+
+	entity_add_clickevent
+	(
+		self->ent_worldview,
+		game_event_new
+		(
+			(void*)self,
+			(void*)self,
+			(int)command_map_toggleVisibility,
+			-1,
+			map_reciever,
+			NULL,
+			system_uiState,
+			1
+		)
+	);
+}
 
 void system_init(System* self, char* name, Vector2D worldpos, Uint32 num_neighbor_systems, Uint32 num_planets)
 {
@@ -175,9 +202,11 @@ void system_init(System* self, char* name, Vector2D worldpos, Uint32 num_neighbo
 
 	self->planets = malloc(sizeof(Planet*) * num_planets);
 
+	//Load map sprite
+
 	vector2d_copy(self->worldpos, worldpos);
 
-	self->ent = entity_init
+	self->ent_worldview = entity_init
 	(
 		gf2d_sprite_load_image("assets/images/gameobjects/star.png"),
 		worldpos,
@@ -185,6 +214,10 @@ void system_init(System* self, char* name, Vector2D worldpos, Uint32 num_neighbo
 		1,
 		0
 	);
+
+	//Load system view sprite
+
+	self->sprite_systemview = gf2d_sprite_load_image("assets/images/gameobjects/star_systemview.png"); 
 
 	//Set all the neighboring systems' pointers to NULL for the time being
 	for (i = 0; i < num_neighbor_systems; i++)
@@ -198,26 +231,8 @@ void system_init(System* self, char* name, Vector2D worldpos, Uint32 num_neighbo
 		self->planets[i] = NULL;
 	}
 
-	entity_add_clickevent
-	(
-		self->ent,
-		game_event_new
-		(
-			(void*)self,
-			(void*)self,
-			(int)command_system_seePlanets,
-			-1,
-			system_reciever,
-			NULL,
-			NULL
-		)
-	);
+	system_clickevent(self);
 
-}
-
-void system_reciever(Game_Event* gameEvent)
-{
-	slog("SYSTEM RECIEVER");
 }
 
 void system_add_neighbor(System* self, System* neighbor)
@@ -276,8 +291,123 @@ void system_add_planet(System* self, Planet* planet)
 
 void system_free(System* self)
 {
-	entity_free(self->ent);
+	entity_free(self->ent_worldview);
 
 	memset(&self, 0, sizeof(System));
+}
+
+
+//System Code
+
+void system_reciever(void* self_void, Game_Event* gameEvent)
+{
+	System* self;
+	
+	if (!self_void)
+	{
+		slog("Cannot recieve event for NULL system"); return;
+	}
+
+	if (!gameEvent)
+	{
+		slog("Cannot recieve NULL system event"); return;
+	}
+
+	self = (System*) self_void;
+
+	if (gameEvent->event_command == (int)command_system_systemView)
+	{
+		
+	}
+}
+
+UI_State* system_uiState(void* self_void, Game_Event* gameEvent_prev)
+{
+	int i;
+
+	float planet_spacing; float planet_sprite_w_total;
+
+	System* self;
+
+	UI_State* self_uiState;
+	UI_Arrangement* curr_uiArr;
+
+	self = (System*)self_void;
+
+	slog("SYSTEM UI STATE");
+
+	//Create new UI State
+	self_uiState = ui_state_new(
+		5,
+		self_void,
+		system_uiState,
+		NULL,
+		NULL
+	);
+
+	//Create UI Arr with just the system view visual (first moving it to the top-center)
+
+	curr_uiArr = ui_arr_new(
+		ui_object_new(
+			entity_init
+			(
+				self->sprite_systemview,
+				vector2d
+				(
+					get_gamedata()->screensize.x / 2 - self->sprite_systemview->frame_w / 2,
+					get_gamedata()->screensize.y / 20
+				),
+				COLL_CIRCLE,
+				0,
+				0
+			)
+		),
+		0,
+		10
+	);
+
+	ui_state_pushback(self_uiState, curr_uiArr);
+
+	//Planets UI Arr
+
+	planet_sprite_w_total = 0;
+
+	//Temporarily set planet_spacing to the combined frame width of all the planet sprites
+
+	for (i = 0; i < self->num_planets; i++)
+	{
+		planet_sprite_w_total += self->planets[i]->sprite_systemview->frame_w;
+	}
+
+	planet_spacing = (get_gamedata()->screensize.x - planet_sprite_w_total) / (self->num_planets + 1);
+
+	curr_uiArr = ui_arr_new(
+		NULL,
+		planet_spacing,
+		0
+	);
+
+	//Add the first planet
+
+	ui_arr_add(curr_uiArr, planet_uiobj(self->planets[0]));
+
+	//Place the first planet at the necessary coordinates to have a visually consistent ui_array
+
+	vector2d_copy(
+		curr_uiArr->top->ent->pos, 
+		vector2d(
+			planet_spacing, 
+			(get_gamedata()->screensize.y * 9/10) - (planet_sprite_w_total / self->num_planets)
+		)
+	);
+
+	for (i = 1; i < self->num_planets; i++)
+	{
+		ui_arr_add(curr_uiArr, planet_uiobj(self->planets[i]));
+	}
+
+	ui_state_pushback(self_uiState, curr_uiArr);
+
+	return self_uiState;
 }
 

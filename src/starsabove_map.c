@@ -75,6 +75,7 @@ SJson* map_toJson()
 	return map_json;
 }
 
+
 void map_init(Uint32 num_systems)
 {
 	int i;
@@ -86,6 +87,8 @@ void map_init(Uint32 num_systems)
 
 	game_map.num_systems = num_systems;
 	game_map.systems = malloc(sizeof(System) * num_systems);
+
+	game_map._hidden = 0;
 }
 
 void map_drawPaths()
@@ -97,6 +100,11 @@ void map_drawPaths()
 		slog("Cannot draw paths for unitialized map"); return;
 	}
 
+	if (game_map._hidden == 1)
+	{
+		return;
+	}
+
 	for (i = 0; i < game_map.num_systems; i++)
 	{
 
@@ -105,8 +113,8 @@ void map_drawPaths()
 			//NOTE: Maybe add and compare IDs? 'a' value in vector4d must be half of what we actually want because of twice-over redraws
 			gf2d_draw_line
 			(
-				game_map.systems[i].ent->collidercircle->viewpos,
-				game_map.systems[i].neighbor_systems[j]->ent->collidercircle->viewpos,
+				game_map.systems[i].ent_worldview->collidercircle->viewpos,
+				game_map.systems[i].neighbor_systems[j]->ent_worldview->collidercircle->viewpos,
 				vector4d(255, 255, 255, 50)
 			);
 		}
@@ -134,4 +142,63 @@ void map_free()
 Map* get_map()
 {
 	return &game_map;
+}
+
+
+void map_reciever(void* self_void, Game_Event* gameEvent)
+{
+
+
+	if (!game_map.systems)
+	{
+		slog("Cannot free NULL map"); return;
+	}
+
+	if (gameEvent->event_command == (int)command_map_toggleVisibility)
+	{
+		if (game_map._hidden == 0)
+		{
+			map_hide();
+		}
+
+		else
+		{
+			map_show();
+		}
+	}
+}
+
+void map_hide()
+{
+	int i;
+
+	if (!game_map.systems)
+	{
+		slog("Cannot free NULL map"); return;
+	}
+
+	for (i = 0; i < game_map.num_systems; i++)
+	{
+		game_map.systems[i].ent_worldview->_hidden = 1;
+	}
+
+	game_map._hidden = 1;
+
+}
+
+void map_show()
+{
+	int i;
+
+	if (!game_map.systems)
+	{
+		slog("Cannot free NULL map"); return;
+	}
+
+	for (i = 0; i < game_map.num_systems; i++)
+	{
+		game_map.systems[i].ent_worldview->_hidden = 0;
+	}
+
+	game_map._hidden = 0;
 }

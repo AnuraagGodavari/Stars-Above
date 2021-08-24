@@ -50,6 +50,8 @@ void game_save(char* savename);
 
 void game_loop();
 
+Game_Data* get_gamedata();
+
 /* Other game stuff */
 
 void game_recieve_event(Game_Event* event);

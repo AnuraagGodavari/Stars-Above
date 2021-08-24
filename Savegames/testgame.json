@@ -7,7 +7,7 @@
 			
 			{
 				"name": "System1",
-				"worldpos": [100, 100],
+				"worldpos": [400, 100],
 				"neighbors":
 				[
 					"System2"
@@ -15,22 +15,25 @@
 				"planets":
 				[
 					{
-						"name": "System1 I"
+						"name": "System1 I",
+						"type": "cambrianlike"
 					},
 					
 					{
 						"name": "System1 II"
+						"type": "desertlike"
 					},
 					
 					{
 						"name": "System1 III"
+						"type": "earthlike"
 					}
 				]
 			},
 			
 			{
 				"name": "System2",
-				"worldpos": [200, 200],
+				"worldpos": [500, 200],
 				"neighbors":
 				[
 					"System1",
@@ -40,21 +43,24 @@
 				[
 					{
 						"name": "System2 I"
+						"type": "icelike"
 					},
 					
 					{
 						"name": "System2 II"
+						"type": "marslike"
 					},
 					
 					{
 						"name": "System2 III"
+						"type": "neptunelike"
 					}
 				]
 			},
 			
 			{
 				"name": "System3",
-				"worldpos": [300, 300],
+				"worldpos": [600, 300],
 				"neighbors":
 				[
 					"System2"
@@ -63,14 +69,17 @@
 				[
 					{
 						"name": "System3 I"
+						"type": "saturnlike"
 					},
 					
 					{
 						"name": "System3 II"
+						"type": "earthlike"
 					},
 					
 					{
 						"name": "System3 III"
+						"type": "icelike"
 					}
 				]
 			}
