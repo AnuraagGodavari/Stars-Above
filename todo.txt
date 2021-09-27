@@ -1,0 +1,5 @@
+planet name labels
+resources menu when planet is clicked
+buildings menu
+be able to build buildings
+networking crap

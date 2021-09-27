@@ -326,15 +326,19 @@ UI_State* system_uiState(void* self_void, Game_Event* gameEvent_prev)
 	int i;
 
 	float planet_spacing; float planet_sprite_w_total;
+	float textbox_spacing;
+
+	char temp[128];
 
 	System* self;
 
+	UI_Object* curr_uiObj;
 	UI_State* self_uiState;
 	UI_Arrangement* curr_uiArr;
 
-	self = (System*)self_void;
+	Sprite* sprite_textbox;
 
-	slog("SYSTEM UI STATE");
+	self = (System*)self_void;
 
 	//Create new UI State
 	self_uiState = ui_state_new(
@@ -404,6 +408,51 @@ UI_State* system_uiState(void* self_void, Game_Event* gameEvent_prev)
 	for (i = 1; i < self->num_planets; i++)
 	{
 		ui_arr_add(curr_uiArr, planet_uiobj(self->planets[i]));
+	}
+
+	ui_state_pushback(self_uiState, curr_uiArr);
+
+
+	//Planet Names UI Arr, plus first element
+
+	sprite_textbox = gf2d_sprite_load_image("assets/images/ui/textbox_brown.png");
+
+	textbox_spacing = (get_gamedata()->screensize.x - (self->num_planets * sprite_textbox->frame_w)) / (self->num_planets + 1);
+
+	curr_uiArr = ui_arr_new(
+		ui_object_new
+		(
+			entity_init(sprite_textbox, vector2d(0, 0), COLL_BOX, 0, 0)
+		),
+		textbox_spacing,
+		0
+	);
+
+	entity_add_text(curr_uiArr->top->ent, self->planets[0]->name, font_load("assets/fonts/futura light bt.ttf", 16));
+
+	//Place the first textbox at the necessary coordinates to have a visually consistent ui_array
+
+	vector2d_copy(
+		curr_uiArr->top->ent->pos,
+		vector2d(
+			textbox_spacing,
+			(get_gamedata()->screensize.y * 19 / 20) - sprite_textbox->frame_h
+		)
+	);
+
+	for (i = 1; i < self->num_planets; i++)
+	{
+		curr_uiObj = ui_object_new
+		(
+			entity_init(sprite_textbox, vector2d(0, 0), COLL_BOX, 0, 0)
+		);
+
+		ui_arr_add(
+			curr_uiArr,
+			curr_uiObj
+		);
+
+		entity_add_text(curr_uiObj->ent, self->planets[i]->name, font_load("assets/fonts/futura light bt.ttf", 16));
 	}
 
 	ui_state_pushback(self_uiState, curr_uiArr);

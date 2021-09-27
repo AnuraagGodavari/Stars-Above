@@ -20,6 +20,7 @@ typedef struct UI_Object_s
 {
 
 	Entity* ent;
+	Entity* label;
 
 	struct UI_Object_s* next;
 

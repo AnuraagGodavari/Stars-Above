@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<NotepadPlus>
+    <Session activeView="0">
+        <mainView activeIndex="0">
+            <File firstVisibleLine="32" xOffset="0" scrollWidth="11896" startPos="1170" endPos="1170" selMode="0" offset="0" wrapCount="1" lang="JSON" encoding="-1" userReadOnly="no" filename="D:\Programs\C\StarsAbove\Savegames\testgame.json" backupFilePath="" originalFileLastModifTimestamp="34733312" originalFileLastModifTimestampHigh="30906303" mapFirstVisibleDisplayLine="-1" mapFirstVisibleDocLine="-1" mapLastVisibleDocLine="-1" mapNbLine="-1" mapHigherPos="-1" mapWidth="-1" mapHeight="-1" mapKByteInDoc="101" mapWrapIndentMode="-1" mapIsWrap="no" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="4088" startPos="0" endPos="0" selMode="0" offset="0" wrapCount="3" lang="JSON" encoding="-1" userReadOnly="no" filename="D:\Programs\C\StarsAbove\Savegames\TESTOUT.json" backupFilePath="" originalFileLastModifTimestamp="-1818464256" originalFileLastModifTimestampHigh="30906510" mapFirstVisibleDisplayLine="-1" mapFirstVisibleDocLine="-1" mapLastVisibleDocLine="-1" mapNbLine="-1" mapHigherPos="-1" mapWidth="-1" mapHeight="-1" mapKByteInDoc="-1" mapWrapIndentMode="-1" mapIsWrap="no" />
+        </mainView>
+        <subView activeIndex="0" />
+    </Session>
+</NotepadPlus>

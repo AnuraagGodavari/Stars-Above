@@ -4,6 +4,13 @@ Game_Data gamedata = { 0 };
 
 int done = 0;
 
+
+void game_init_entitymanager()
+{
+    entity_manager_init(100, 100);
+}
+
+
 Game_Data* get_gamedata()
 {
     return &gamedata;
@@ -141,6 +148,8 @@ void game_loop()
 {
 
 }
+
+
 
 int main(int argc, char* argv[])
 {
